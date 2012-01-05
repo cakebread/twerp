@@ -1,49 +1,50 @@
 Twerp README
 ============
 
-Install twerp:
+.. contents::
+
+Installation
+------------
 
 pip install twerp
 
 
-
-Configure twerp:
+Configure twerp
+---------------
 
 ~/.twerprc
 
 
 ACCOUNT_SID=a902830980980980ff987yada
-
 AUTH_TOKEN=98798asdfas9df87sadf987yada
-
 CALLERID=+12135551212
 
 
 Usage Examples:
 
+    $ twerp -N
 
-List your Twilio phone numbers:
-
-twerp -N
-
-
-List lots of details about each of your Twilio numbers:
-
-twerp -Nv
+         List your Twilio phone numbers:
 
 
-Send SMS message:
+    $ twerp -Nv
 
-twerp -s 'this is a test' -r +12135551212
-
-
-List all your SMS messages (Careful if you have zillions!)
-
-twerp -L
+         List lots of details about each of your Twilio numbers:
 
 
-Show details of SMS message by SID
+    $ twerp -s 'this is a test' -r +12135551212
 
-twerp -S nnnnnnnnnnnn
+         Send SMS message:
+
+
+    $ twerp -L
+
+         List all your SMS messages (Careful if you have zillions!)
+
+
+    $ twerp -S nnnnnnnnnnnn
+
+         Show details of SMS message by SID
+
 
 
