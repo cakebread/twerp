@@ -30,7 +30,7 @@ Usage Examples
 
     $ twerp -N
 
-         List your Twilio phone numbers:
+         List your Twilio phone numbers
 
 
     $ twerp -Nv
@@ -40,12 +40,12 @@ Usage Examples
 
     $ twerp -s 'this is a test' -r +12135551212
 
-         Send SMS message:
+         Send SMS message
 
 
     $ twerp -L
 
-         List all your SMS messages (Careful if you have zillions!)
+         List all of your SMS messages (Be careful if you have zillions!)
 
 
     $ twerp -S nnnnnnnnnnnn
@@ -53,4 +53,9 @@ Usage Examples
          Show details of SMS message by SID
 
 
+
+TODO
+----
+
+See http://blog.cakebread.info/
 
