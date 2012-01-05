@@ -1,6 +1,11 @@
 Twerp README
 ============
 
+Install twerp:
+
+pip install twerp
+
+
 
 Configure twerp:
 
