@@ -3,6 +3,13 @@
 News
 ====
 
+0.0.2
+-----
+
+*Release date: 1/6/2012
+
+* Added voice dialing
+
 0.0.1
 -----
 

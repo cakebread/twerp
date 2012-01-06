@@ -38,14 +38,16 @@ Usage Examples
          List lots of details about each of your Twilio numbers:
 
 
-    $ twerp -s 'this is a test' -r +12135551212
+    $ twerp -m 'this is a test' -s +12135551212
 
-         Send SMS message
+         Send SMS message to +12135551212
 
+    $ twerp -c +12135551212 -u http://computer.net/TWIML
+         Call +12135551212 and execute the TWIML at given URL
 
-    $ twerp -L
+    $ twerp -l
 
-         List all of your SMS messages (Be careful if you have zillions!)
+         List all of your SMS messages (Be careful if you have zillions, filtering coming soon)
 
 
     $ twerp -S nnnnnnnnnnnn
