@@ -66,6 +66,26 @@ def get_sms_sid(sid):
     print 'body:', sms.body
 
 
+def call_numbers(recipients, verbose=False, callerid=CALLER_ID, url=None):
+    """
+    callerid: string
+    recipients: list of strings representing each phone number
+    """
+    if callerid is None:
+        #No callerid set with -i, using CALLER_ID in ~/.twerprc"
+        callerid=CALLER_ID
+
+    #twimlet = 'http://twimlets.com/message?Message%5B0%5D=twerp%20calling.%20Hello!&'
+    client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
+
+    for phone in recipients:
+        call = client.calls.create(to=phone, from_=callerid, url=url)
+        if verbose:
+            print "Status:", call.status
+            print "SID:", call.sid
+
+
+
 def send_sms(recipients, message, verbose=False, callerid=CALLER_ID):
     """
     callerid: string

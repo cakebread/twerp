@@ -26,7 +26,7 @@ from configobj import ConfigObj
 from clint.textui import colored, puts, indent
 
 from twerp.__init__ import __version__ as VERSION
-from twerp.mytwilio import send_sms, list_sms, get_sms_sid, list_numbers
+from twerp.mytwilio import send_sms, list_sms, get_sms_sid, list_numbers, call_numbers
 
 
 class Twerp(object):
@@ -64,19 +64,28 @@ class Twerp(object):
         opt_parser = setup_opt_parser()
         (self.options, remaining_args) = opt_parser.parse_args()
         logger = self.set_log_level()
+
         if self.options.numbers:
-            list_numbers(self.options.verbose)
+            return list_numbers(self.options.verbose)
+        elif self.options.call:
+            if not self.options.url:
+                logger.error("You must specify a --url with TWIML")
+                return 1
+            numbers = self.options.call.split(",")
+            return call_numbers(numbers, self.options.verbose,
+                    self.options.callerid, self.options.url)
         elif self.options.listsms:
-            list_sms()
+            return list_sms()
         elif self.options.twerp_version:
             return self.twerp_version()
         elif self.options.sid:
-            get_sms_sid(self.options.sid)
-        elif self.options.sms:
-            send_sms([self.options.recipient], self.options.sms,
-            self.options.verbose)
+            return get_sms_sid(self.options.sid)
+        elif self.options.sms_recipients:
+            numbers = self.options.sms_recipients.split(",")
+            return send_sms(numbers, self.options.sms_message, self.options.verbose)
         else:
             opt_parser.print_help()
+        return 0
 
     def twerp_version(self):
         """
@@ -101,34 +110,69 @@ def setup_opt_parser():
     usage = "usage: %prog [options]"
     opt_parser = optparse.OptionParser(usage=usage)
 
-    opt_parser.add_option("--version", action='store_true',
+    opt_parser.add_option("--V", "--version", action="store_true",
             dest="twerp_version", default=False,
             help="Show twerp version and exit.")
     opt_parser.add_option("-v", "--verbose", action='store_true',
             dest="verbose", default=False, help="Show more output stuff.")
-
-    opt_parser.add_option("-s", "--sms", action='store',
-            dest="sms", default=False, help="Send SMS text message")
-
-    opt_parser.add_option("-r", "--recipient", action='store',
-            dest="recipient", default=False, help="Number to call or SMS.")
 
     opt_parser.add_option("--debug", action='store_true',
             dest="debug", default=False, help="Show debugging information.")
 
     opt_parser.add_option("-q", "--quiet", action='store_true',
             dest="quiet", default=False, help="Show less output.")
-    #Reporting options:
-    opt_parser.add_option("-L", "--list-sms", action='store_true',
-            dest="listsms", default=False, help="List incoming SMS messages.")
 
-    opt_parser.add_option("-N", "--numbers", action='store_true',
-            dest="numbers", default=False,
-            help="Show all my Twilio phone numbers")
+    group_common = optparse.OptionGroup(opt_parser,
+            "Common options",
+            "These options can be used for both SMS and voice calls.")
 
-    opt_parser.add_option("-S", "--SID", action='store',
+    group_common.add_option("-i", "--callerid", action='store',
+            dest="callerid", default=None,
+            help="Phone number you are calling from or texting from.")
+
+
+    group_sms = optparse.OptionGroup(opt_parser,
+            "SMS options",
+            "Send and reveive SMS text messages.")
+    group_sms.add_option("-m", "--message", action='store', metavar="<TXT MSG>",
+            dest="sms_message", default=False, help="Send SMS text message")
+
+    group_sms.add_option("-s", "--sms", action='store',
+            dest="sms_recipients", default=False,
+            metavar="+12135551212,+14155551212",
+            help="Send SMS text message to list of numbers.")
+
+
+    group_sms.add_option("-l", "--list-sms", action='store_true',
+            dest="listsms", default=False, help="Show incoming SMS messages.")
+
+    group_call = optparse.OptionGroup(opt_parser,
+            "Voice call options",
+            "Place phone calls, execute TWIML.")
+    group_call.add_option("-c", "--call", action='store',
+            metavar="+12135551212,+14155551212",
+            help="List of numbers to call or send SMS text message to.",
+            dest="call", default=False)
+
+    group_call.add_option("-u", "--url", action='store',
+            metavar="URL of TWIML",
+            dest="url", default=False, help="URL of TWIML to pass call with --call")
+
+    group_reports = optparse.OptionGroup(opt_parser,
+            "Reporting options",
+            "List your Twilio phone numbers and detailed information about each.")
+
+    group_reports.add_option("-N", "--numbers", action='store_true',
+            dest="numbers", default=False, help="Show all my Twilio phone "+
+            "numbers. Use -Nv for detailed info on each number.")
+
+    group_reports.add_option("-S", "--SID", action='store',
             dest="sid", default=False, help="Show log for given SID")
 
+    opt_parser.add_option_group(group_common)
+    opt_parser.add_option_group(group_sms)
+    opt_parser.add_option_group(group_call)
+    opt_parser.add_option_group(group_reports)
     return opt_parser
 
 
