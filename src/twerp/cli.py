@@ -26,7 +26,8 @@ from configobj import ConfigObj
 from clint.textui import colored, puts, indent
 
 from twerp.__init__ import __version__ as VERSION
-from twerp.mytwilio import send_sms, list_sms, get_sms_sid, list_numbers, call_numbers
+from twerp.mytwilio import (send_sms, list_sms, get_sms_sid,
+        list_numbers, call_numbers)
 
 
 class Twerp(object):
@@ -82,7 +83,8 @@ class Twerp(object):
             return get_sms_sid(self.options.sid)
         elif self.options.sms_recipients:
             numbers = self.options.sms_recipients.split(",")
-            return send_sms(numbers, self.options.sms_message, self.options.verbose)
+            return send_sms(numbers, self.options.sms_message,
+                    self.options.verbose)
         else:
             opt_parser.print_help()
         return 0
@@ -130,18 +132,17 @@ def setup_opt_parser():
             dest="callerid", default=None,
             help="Phone number you are calling from or texting from.")
 
-
     group_sms = optparse.OptionGroup(opt_parser,
             "SMS options",
             "Send and reveive SMS text messages.")
-    group_sms.add_option("-m", "--message", action='store', metavar="<TXT MSG>",
+    group_sms.add_option("-m", "--message", action='store',
+            metavar="<TXT MSG>",
             dest="sms_message", default=False, help="Send SMS text message")
 
     group_sms.add_option("-s", "--sms", action='store',
             dest="sms_recipients", default=False,
             metavar="+12135551212,+14155551212",
             help="Send SMS text message to list of numbers.")
-
 
     group_sms.add_option("-l", "--list-sms", action='store_true',
             dest="listsms", default=False, help="Show incoming SMS messages.")
@@ -151,7 +152,7 @@ def setup_opt_parser():
             "Place phone calls, execute TWIML.")
     group_call.add_option("-c", "--call", action='store',
             metavar="+12135551212,+14155551212",
-            help="List of numbers to call or send SMS text message to.",
+            help="List of numbers to call, comma-separated.",
             dest="call", default=False)
 
     group_call.add_option("-u", "--url", action='store',
@@ -163,8 +164,7 @@ def setup_opt_parser():
             "List your Twilio phone numbers and detailed information about each.")
 
     group_reports.add_option("-N", "--numbers", action='store_true',
-            dest="numbers", default=False, help="Show all my Twilio phone "+
-            "numbers. Use -Nv for detailed info on each number.")
+            dest="numbers", default=False, help="Show all my Twilio phone \                numbers. Use -Nv for detailed info on each number.")
 
     group_reports.add_option("-S", "--SID", action='store',
             dest="sid", default=False, help="Show log for given SID")

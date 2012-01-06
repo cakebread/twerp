@@ -6,7 +6,7 @@ README = open(os.path.join(here, 'README.rst')).read()
 NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
 
-version = '0.0.1'
+version = '0.0.2'
 
 install_requires = ['twilio>=3.3.3', 'ConfigObj', 'clint']
 
@@ -16,7 +16,13 @@ setup(name='twerp',
     description="Twilio command-line application for sending SMS text messages and making voice calls.",
     long_description=README + '\n\n' + NEWS,
     classifiers=[
-      # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+        'Development Status :: 2 - Pre-Alpha',
+        'Environment :: Console',
+        'License :: OSI Approved :: BSD License',
+        'Programming Language :: Python',
+        'Topic :: Communications :: Telephony',
+        'Topic :: Communications :: Internet Phone',
+        'Topic :: Communications :: Conferencing'
     ],
     keywords='twilio sms telephony',
     author='Rob Cakebread',
