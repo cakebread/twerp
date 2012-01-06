@@ -43,7 +43,13 @@ Usage Examples
          Send SMS message to +12135551212
 
     $ twerp -c +12135551212 -u http://computer.net/TWIML
+
          Call +12135551212 and execute the TWIML at given URL
+
+    $ twerp -c +12135551212,+13235551212 -u http://twimlets.com/conference?Music=rock
+
+         Call two numbers and put them in a conference room. First one gets rock music till another caller joins.
+
 
     $ twerp -l
 
