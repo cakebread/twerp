@@ -164,8 +164,8 @@ def setup_opt_parser():
             "List your Twilio phone numbers and detailed information about each.")
 
     group_reports.add_option("-N", "--numbers", action='store_true',
-            dest="numbers", default=False, help="Show all my Twilio phone \                numbers. Use -Nv for detailed info on each number.")
-
+            dest="numbers", default=False, help="Show all my Twilio phone " +                
+            "numbers. Use -Nv for detailed info on each number.") 
     group_reports.add_option("-S", "--SID", action='store',
             dest="sid", default=False, help="Show log for given SID")
 
