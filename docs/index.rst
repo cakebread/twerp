@@ -21,11 +21,16 @@ Example Usage
 
          Send SMS message to +12135551212
 
-    $ twerp -c +12135551212 -u http://computer.net/TWIML
+    $ twerp -d +12135551212 -u http://computer.net/TwiML
 
          Call +12135551212 and execute the TWIML at given URL
 
-    $ twerp -c +12135551212,+13235551212 -u http://twimlets.com/conference?Music=rock
+    $ twerp -i -d +12135551212 -u http://computer.net/TwiML
+
+         Call +12135551212 and execute the TWIML at given URL, then go interactive command-line mode.
+         You can then modify the call live with different verbs such as 'url <URL' to re-route calls.
+
+    $ twerp -d +12135551212,+13235551212 -u http://twimlets.com/conference?Music=rock
 
          Call two numbers and put them in a conference room. First one gets rock music till another caller joins.
 
