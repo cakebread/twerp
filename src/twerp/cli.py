@@ -18,6 +18,7 @@ __docformat__ = 'restructuredtext'
 
 
 import os
+import cmd
 import sys
 import optparse
 import logging
@@ -27,8 +28,44 @@ from clint.textui import colored, puts, indent
 
 from twerp.__init__ import __version__ as VERSION
 from twerp.mytwilio import (send_sms, list_sms, get_sms_sid,
-        list_numbers, call_numbers)
+        list_numbers, list_calls, call_numbers, call_url)
 
+
+class Interactive(cmd.Cmd):
+    """Simple command processor example."""
+    def __init__(self, sid=None, callerid=None):
+        cmd.Cmd.__init__(self)
+        self.sid = sid
+        self.callerid = callerid
+
+    def cmdloop(self, sid=None, callerid=None):
+        intro = "Type 'help' for twerp commands"
+        if self.sid:
+            self.prompt = "twerp (SID:%s...%s) [%s]) >> " % (self.sid[0:5], self.sid[:-3], self.callerid)
+        else:
+            self.prompt = "twerp >> "
+        return cmd.Cmd.cmdloop(self, intro)    
+
+    def do_list(self, args=None):
+        list_calls()
+
+    def do_sid(self, sid):
+        if sid:
+            self.sid = sid
+        else:
+            print "You must specify the SID to use."
+
+    def do_url(self, url):
+        if url:
+            call = call_url(self.sid, url)
+            print dir(call)
+            #self.callerid = call.callerid
+            print call.status
+        else:
+            print "You need to specify a valid TWML URL e.g. http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient"
+    
+    def do_EOF(self, line):
+        return True
 
 class Twerp(object):
 
@@ -68,13 +105,15 @@ class Twerp(object):
 
         if self.options.numbers:
             return list_numbers(self.options.verbose)
-        elif self.options.call:
+        elif self.options.dial:
             if not self.options.url:
-                logger.error("You must specify a --url with TWIML")
+                logger.error("You must specify a --url with TWML")
                 return 1
-            numbers = self.options.call.split(",")
-            return call_numbers(numbers, self.options.verbose,
-                    self.options.callerid, self.options.url)
+            numbers = self.options.dial.split(",")
+            sid, callerid = call_numbers(numbers, self.options.verbose,
+                    self.options.callerid, self.options.url,
+                    self.options.interactive)
+            Interactive(sid=sid, callerid=callerid).cmdloop()
         elif self.options.listsms:
             return list_sms()
         elif self.options.twerp_version:
@@ -128,7 +167,7 @@ def setup_opt_parser():
             "Common options",
             "These options can be used for both SMS and voice calls.")
 
-    group_common.add_option("-i", "--callerid", action='store',
+    group_common.add_option("-c", "--callerid", action='store',
             dest="callerid", default=None,
             help="Phone number you are calling from or texting from.")
 
@@ -150,10 +189,14 @@ def setup_opt_parser():
     group_call = optparse.OptionGroup(opt_parser,
             "Voice call options",
             "Place phone calls, execute TWIML.")
-    group_call.add_option("-c", "--call", action='store',
+    group_call.add_option("-d", "--dial", action='store',
             metavar="+12135551212,+14155551212",
-            help="List of numbers to call, comma-separated.",
-            dest="call", default=False)
+            help="List of numbers to dial, comma-separated.",
+            dest="dial", default=False)
+
+    group_call.add_option("-i", "--interactive", action='store_true',
+            help="Go into interactive command-line mode after dialing.",
+            dest="interactive", default=False)
 
     group_call.add_option("-u", "--url", action='store',
             metavar="URL of TWIML",

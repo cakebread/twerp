@@ -21,6 +21,7 @@ import logging
 from configobj import ConfigObj
 
 from twilio.rest import TwilioRestClient
+from twilio import TwilioRestException
 from clint.textui import colored, puts, indent
 
 twerp_config = os.path.join(os.path.expanduser("~"), '.twerprc')
@@ -37,6 +38,7 @@ config = ConfigObj(twerp_config)
 AUTH_TOKEN = config['AUTH_TOKEN']
 ACCOUNT_SID = config['ACCOUNT_SID']
 CALLER_ID = config['CALLER_ID']
+MAX_LENGTH = 160
 
 
 #These are for showing detailed info about your Twilio phone numbers It uses
@@ -53,6 +55,11 @@ NUMBER_IDS = ['account_sid', 'api_version', 'auth', 'base_uri', 'capabilities',
             'voice_url']
 
 
+
+def trim(text_msg):
+    '''Twilio will throw an error if we go over the length limit'''
+    return text_msg[0:MAX_LENGTH]
+
 def get_sms_sid(sid):
     """Print results for given SID"""
 
@@ -65,14 +72,36 @@ def get_sms_sid(sid):
     print 'status:', sms.status
     print 'body:', sms.body
 
+class Call(object):
+    '''For making --pretend calls'''
+    def __init__(self):
+        self.sid = "SID_GOES_HERE"
+        self.status = "in progress(test)"
 
-def call_numbers(recipients, verbose=False, callerid=CALLER_ID, url=None):
+def call_url(sid, url):
+    '''Call a URL/Twimlet'''
+    client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
+
+    return client.calls.route(sid, url, method="POST")
+
+
+def list_calls():
+    '''Call a URL/Twimlet'''
+    client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
+    calls = client.calls.list(status=Call.IN_PROGRESS)
+    for c in calls:
+        c.hangup()
+
+
+
+def call_numbers(recipients, verbose=False, callerid=CALLER_ID, url=None,
+        interactive=None):
     """
     callerid: string
     recipients: list of strings representing each phone number
     """
+
     if callerid is None:
-        #No callerid set with -i, using CALLER_ID in ~/.twerprc"
         callerid=CALLER_ID
 
     #twimlet = 'http://twimlets.com/message?Message%5B0%5D=twerp%20calling.%20Hello!&'
@@ -80,10 +109,13 @@ def call_numbers(recipients, verbose=False, callerid=CALLER_ID, url=None):
 
     for phone in recipients:
         call = client.calls.create(to=phone, from_=callerid, url=url)
+        #call = Call()
         if verbose:
             print "Status:", call.status
             print "SID:", call.sid
-
+            print "Answered by:", call.answered_by
+    if interactive:
+        return call.sid, call.answered_by
 
 
 def send_sms(recipients, message, verbose=False, callerid=CALLER_ID):
