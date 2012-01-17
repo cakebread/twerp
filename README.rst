@@ -87,10 +87,10 @@ Interactive Mode Commands
  * list - List all calls in progress, ringing or queued
  * hangup - Hang up call associated with SID shown in prompt
  * nuke - Hang up all calls associated with account. ALL OF THEM!
- * forward - Forward call to another phone number
- * url - Redirect flow of call to TwiML at a URL
- * info - Show info for current SID or SID given
- * sid - Change the current SID associated with interactive-mode
+ * forward <nnnnnnnnnn> - Redirect current call to another phone number
+ * url <URL> - Redirect flow of call to TwiML at a URL
+ * info [<SID>] - Show info for current SID or SID given
+ * sid <SID> - Change the current SID associated with interactive-mode
 
 
 TODO
