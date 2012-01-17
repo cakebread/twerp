@@ -26,7 +26,7 @@ CALLERID=+12135551212
 
 
 Usage Examples
---------------
+==============
 
     $ twerp -N
 
@@ -60,6 +60,37 @@ Usage Examples
 
          Show details of SMS message by SID
 
+
+    $ twerp -i --dial +13235551212 -u http://twimlets.com/conference?Music=rock
+         Go into interactive command-line mode after calling number.
+
+
+Interactive Mode
+================
+
+
+The Prompt
+----------
+
+The prompt will have part of the SID if a call is in progress:
+
+    twerp (CA3...ab) >>
+
+If you hang up a call, for example, there will be no SID, so the prompt will look like this:
+
+    twerp (...) >>
+
+
+Interactive Mode Commands
+-------------------------
+
+list - List all calls in progress, ringing or queued
+hangup - Hang up call associated with SID shown in prompt
+nuke - Hang up all calls associated with account. ALL OF THEM!
+forward - Forward call to another phone number
+url - Redirect flow of call to TwiML at a URL
+info - Show info for current SID or SID given
+sid - Change the current SID associated with interactive-mode
 
 
 TODO
