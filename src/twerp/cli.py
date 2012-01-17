@@ -222,7 +222,7 @@ class Twerp(object):
 
         @returns: 0
         """
-        self.logger.info("twerp version %s" % VERSION)
+        print("twerp version %s" % VERSION)
         return 0
 
 
@@ -239,7 +239,7 @@ def setup_opt_parser():
     usage = "usage: %prog [options]"
     opt_parser = optparse.OptionParser(usage=usage)
 
-    opt_parser.add_option("--V", "--version", action="store_true",
+    opt_parser.add_option("-V", "--version", action="store_true",
             dest="twerp_version", default=False,
             help="Show twerp version and exit.")
     opt_parser.add_option("-v", "--verbose", action='store_true',
