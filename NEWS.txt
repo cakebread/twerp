@@ -3,6 +3,16 @@
 News
 ====
 
+0.0.3
+-----
+
+*Release date: 1/10/2012
+
+* Added --interactive command-line feture to control calls in progress
+* Changed many keyword options, we're still super++ pre-alpha, so I can do that.
+* Added docs at http://twerp.rtfd.org/
+
+
 0.0.2
 -----
 

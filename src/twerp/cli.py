@@ -22,50 +22,133 @@ import cmd
 import sys
 import optparse
 import logging
+from urllib import quote_plus
 
 from configobj import ConfigObj
 from clint.textui import colored, puts, indent
 
 from twerp.__init__ import __version__ as VERSION
 from twerp.mytwilio import (send_sms, list_sms, get_sms_sid,
-        list_numbers, list_calls, call_numbers, call_url)
+        list_numbers, list_calls, call_numbers, call_url,
+        hangup_all_calls, sid_call, notifications, hangup)
+
+URLS = ['http://twimlets.com/holdmusic?Bucket=com.twilio.music.rock&',
+        'http://twimlets.com/holdmusic?Bucket=com.twilio.music.soft-rock&',
+        'http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient&',
+        'http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical&',
+        'http://twimlets.com/holdmusic?Bucket=com.twilio.music.electronica&',
+        'http://twimlets.com/holdmusic?Bucket=com.twilio.music.guitars&',
+        'http://twimlets.com/holdmusic?Bucket=com.twilio.music.newage&',
+        ]
 
 
 class Interactive(cmd.Cmd):
     """Simple command processor example."""
-    def __init__(self, sid=None, callerid=None):
+    def __init__(self, sid=None):
         cmd.Cmd.__init__(self)
         self.sid = sid
-        self.callerid = callerid
+        self.logger = logging.getLogger("twerp")
 
-    def cmdloop(self, sid=None, callerid=None):
+    def emptyline(self):
+        return
+
+    def postloop(self):
+        '''Print a blank line after program exits interactive mode'''
+        print '\n'
+
+    def cmdloop(self, sid=''):
         intro = "Type 'help' for twerp commands"
-        if self.sid:
-            self.prompt = "twerp (SID:%s...%s) [%s]) >> " % (self.sid[0:5], self.sid[:-3], self.callerid)
+        self.sid = sid
+        self.prompt = "twerp (%s...%s) >> " % (self.sid[0:5], self.sid[-3:])
+        #self.prompt = "twerp >> "
+        try:
+            return cmd.Cmd.cmdloop(self, sid)
+        except KeyboardInterrupt:
+            sys.exit()
+
+    def do_info(self, sid=None):
+        '''
+        Display info for current SID
+        '''
+        if not sid:
+            sid = self.sid
+        if sid:
+            sid_call(sid)
         else:
-            self.prompt = "twerp >> "
-        return cmd.Cmd.cmdloop(self, intro)    
+            self.logger.error("Need an SID")
+
+    def do_hangup(self, arg=None):
+        '''
+        Hangs up call associated with current SID shown in prompt.
+        '''
+        hangup(self.sid)
+        self.prompt = "twerp (...) >> "
+
+    def do_nuke(self, arg=None):
+        '''
+        Hangs up all voice calls in progress for the entire account
+        CAUTION: Read the above carefully.
+        '''
+        hangup_all_calls()
+        self.prompt = "twerp (...) >> "
 
     def do_list(self, args=None):
+        '''
+        List all calls in progress for your account
+        '''
         list_calls()
 
     def do_sid(self, sid):
+        '''
+        Change SID for interactive session. New SID shows in prompt.
+        '''
         if sid:
             self.sid = sid
+            self.prompt = colored.red("twerp (%s...%s) >> " \
+                    % (self.sid[0:5], self.sid[-3:]))
         else:
-            print "You must specify the SID to use."
+            print >> sys.stderr, "You must specify the SID to use."
+
+    def do_forward(self, number):
+        '''
+        Forward call to another phone number. e.g.
+        forward +13235551212
+        '''
+        if number:
+            url = '''http://twimlets.com/forward?PhoneNumber='''
+            text = quote_plus(number)
+            url = '%s%s' % (url, number)
+            print url
+            call = call_url(self.sid, url)
+            #print >> sys.stderr, call.status
 
     def do_url(self, url):
+        '''
+        Redirect call using TwiML at URL e.g.
+        url http://twimlets.com/some.twml
+        '''
         if url:
             call = call_url(self.sid, url)
-            print dir(call)
-            #self.callerid = call.callerid
-            print call.status
+            #print >> sys.stderr, call.status
         else:
-            print "You need to specify a valid TWML URL e.g. http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient"
-    
+            print >> sys.stderr, "You need to specify a valid TWML URL e.g. "
+            print >> sys.stderr, \
+                "http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient"
+
+    def complete_url(self, text, line, begidx, endix):
+        if not text:
+            completions = URLS[:]
+        else:
+            completions = [f
+                            for f in URLS
+                            if f.startswith(text)
+                            ]
+        return completions
+
     def do_EOF(self, line):
+        '''Exit twerp's interactive mode'''
         return True
+
 
 class Twerp(object):
 
@@ -86,9 +169,7 @@ class Twerp(object):
 
         if self.options.debug:
             self.logger.setLevel(logging.DEBUG)
-        elif self.options.quiet:
-            self.logger.setLevel(logging.ERROR)
-        else:
+        elif self.options.verbose:
             self.logger.setLevel(logging.INFO)
         self.logger.addHandler(logging.StreamHandler())
         return self.logger
@@ -101,19 +182,22 @@ class Twerp(object):
         """
         opt_parser = setup_opt_parser()
         (self.options, remaining_args) = opt_parser.parse_args()
-        logger = self.set_log_level()
+        self.logger = self.set_log_level()
 
         if self.options.numbers:
             return list_numbers(self.options.verbose)
         elif self.options.dial:
-            if not self.options.url:
-                logger.error("You must specify a --url with TWML")
+            if not self.options.url and not self.options.say:
+                self.logger.error("You must specify a --url with TwiML")
+                self.logger.error("""e.g. This URL will say 'hello tworld'
+                http://twimlets.com/message?Message%5B0%5D=Hello%20Tworld& """)
                 return 1
             numbers = self.options.dial.split(",")
-            sid, callerid = call_numbers(numbers, self.options.verbose,
+            sid = call_numbers(numbers, self.options.verbose,
                     self.options.callerid, self.options.url,
-                    self.options.interactive)
-            Interactive(sid=sid, callerid=callerid).cmdloop()
+                    self.options.say)
+            if self.options.interactive:
+                return Interactive().cmdloop(sid)
         elif self.options.listsms:
             return list_sms()
         elif self.options.twerp_version:
@@ -124,6 +208,10 @@ class Twerp(object):
             numbers = self.options.sms_recipients.split(",")
             return send_sms(numbers, self.options.sms_message,
                     self.options.verbose)
+        elif self.options.notifications:
+            return notifications(self.options.verbose)
+        elif self.options.interactive:
+            Interactive().cmdloop('')
         else:
             opt_parser.print_help()
         return 0
@@ -198,17 +286,28 @@ def setup_opt_parser():
             help="Go into interactive command-line mode after dialing.",
             dest="interactive", default=False)
 
+    group_call.add_option("-y", "--say", action='store',
+            metavar="Say something.",
+            dest="say", default=False,
+            help="Use with --dial to say something.")
+
     group_call.add_option("-u", "--url", action='store',
             metavar="URL of TWIML",
-            dest="url", default=False, help="URL of TWIML to pass call with --call")
+            dest="url", default=False,
+            help="URL of TWIML to pass call with --call")
 
     group_reports = optparse.OptionGroup(opt_parser,
             "Reporting options",
-            "List your Twilio phone numbers and detailed information about each.")
+            "List your Twilio phone numbers and information about each.")
+
+    group_reports.add_option("-F", "--notifications", action='store_true',
+            dest="notifications", default=False, help="Show notifications " +
+            "from Twilio API (error messages and warnings).")
 
     group_reports.add_option("-N", "--numbers", action='store_true',
-            dest="numbers", default=False, help="Show all my Twilio phone " +                
-            "numbers. Use -Nv for detailed info on each number.") 
+            dest="numbers", default=False, help="Show all my Twilio phone " +
+            "numbers. Use -Nv for detailed info on each number.")
+
     group_reports.add_option("-S", "--SID", action='store',
             dest="sid", default=False, help="Show log for given SID")
 
