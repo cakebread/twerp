@@ -64,7 +64,7 @@ class Interactive(cmd.Cmd):
         try:
             return cmd.Cmd.cmdloop(self, sid)
         except KeyboardInterrupt:
-            sys.exit()
+            sys.exit(0)
 
     def do_info(self, sid=None):
         '''
@@ -197,7 +197,8 @@ class Twerp(object):
                     self.options.callerid, self.options.url,
                     self.options.say)
             if self.options.interactive:
-                return Interactive().cmdloop(sid)
+                Interactive().cmdloop(sid)
+                return
         elif self.options.listsms:
             return list_sms()
         elif self.options.twerp_version:
@@ -212,18 +213,18 @@ class Twerp(object):
             return notifications(self.options.verbose)
         elif self.options.interactive:
             Interactive().cmdloop('')
+            return
         else:
             opt_parser.print_help()
-        return 0
+        return 2
 
     def twerp_version(self):
         """
         Show twerp's version
 
-        @returns: 0
+        @returns: None
         """
         print("twerp version %s" % VERSION)
-        return 0
 
 
 def setup_opt_parser():
@@ -323,7 +324,7 @@ def main():
     Let's do it.
     """
     my_twerp = Twerp()
-    my_twerp.run()
+    return my_twerp.run()
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -76,7 +76,15 @@ def trim(text_msg):
 def notifications(verbose=False):
     '''Print error messages and warnings from Twilio'''
     client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
-    notes = client.notifications.list()
+    try:
+        notes = client.notifications.list()
+    except ServerNotFoundError, e:
+        logger.error(e)
+        return 1
+    except TwilioRestException, e:
+        print e
+        return 1
+
     notes.reverse()
 
     for notification in notes:
@@ -273,7 +281,6 @@ def list_numbers(verbose=False):
     except ServerNotFoundError, e:
         logger.error(e)
         return 1
-
 
 def list_sms():
     """
