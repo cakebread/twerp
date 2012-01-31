@@ -32,6 +32,8 @@ from twerp.mytwilio import (send_sms, list_sms, get_sms_sid,
         list_numbers, list_calls, call_numbers, call_url,
         hangup_all_calls, sid_call, notifications, hangup)
 
+
+#For tab-completion when in interactive mode
 URLS = ['http://twimlets.com/holdmusic?Bucket=com.twilio.music.rock&',
         'http://twimlets.com/holdmusic?Bucket=com.twilio.music.soft-rock&',
         'http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient&',
@@ -59,8 +61,10 @@ class Interactive(cmd.Cmd):
     def cmdloop(self, sid=''):
         intro = "Type 'help' for twerp commands"
         self.sid = sid
-        self.prompt = "twerp (%s...%s) >> " % (self.sid[0:5], self.sid[-3:])
-        #self.prompt = "twerp >> "
+        if self.sid is not None:
+            self.prompt = "twerp (%s...%s) >> " % (self.sid[0:5], self.sid[-3:])
+        else:
+            self.prompt = "twerp (...) >> "
         try:
             return cmd.Cmd.cmdloop(self, sid)
         except KeyboardInterrupt:
