@@ -28,7 +28,7 @@ from configobj import ConfigObj
 from clint.textui import colored, puts, indent
 
 from twerp.__init__ import __version__ as VERSION
-from twerp.mytwilio import (send_sms, list_sms, get_sms_sid,
+from twerp.twiliolib import (send_sms, list_sms, get_sms_sid,
         list_numbers, list_calls, call_numbers, call_url,
         hangup_all_calls, sid_call, notifications, hangup)
 
