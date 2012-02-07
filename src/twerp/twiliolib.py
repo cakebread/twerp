@@ -271,12 +271,20 @@ def list_numbers(verbose=False):
     client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
     try:
         for number in client.phone_numbers.iter():
-            puts(number.friendly_name)
+            puts('%s [%s]' % (number.phone_number, number.friendly_name))
             if verbose:
                 with indent(4, quote=colored.blue(' >')):
                     for id in NUMBER_IDS:
                         puts("%s: %s" % (colored.green(id),
                             getattr(number, NUMBER_IDS[NUMBER_IDS.index(id)])))
+
+            else:
+                pass
+                #puts("  - Voice URL %s" % getattr(number,
+                #   NUMBER_IDS[NUMBER_IDS.index('voice_url')]))
+                #puts("  - SMS URL %s" % getattr(number, NUMBER_IDS[NUMBER_IDS.index('sms_url')]))
+                #puts("%s: %s" % (colored.green(id),
+                #    getattr(number, NUMBER_IDS[NUMBER_IDS.index('voice-url')])))
 
     except ServerNotFoundError, e:
         logger.error(e)
