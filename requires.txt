@@ -1,3 +1,4 @@
 twilio>=3.3.3
 ConfigObj
 clint
+httplib2
