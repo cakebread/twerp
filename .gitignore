@@ -1,0 +1,9 @@
+*.pyc
+*.swp
+.tox/
+build/
+dist/
+src/twerp.egg-info
+tests/__pycache__/
+tests/*.xml
+upload_docs.sh
