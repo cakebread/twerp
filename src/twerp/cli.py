@@ -31,7 +31,6 @@ from twerp.__init__ import __version__ as VERSION
 from twerp.twiliolib import RestClient
 
 
-
 #For tab-completion when in interactive mode
 URLS = ['http://twimlets.com/holdmusic?Bucket=com.twilio.music.rock&',
         'http://twimlets.com/holdmusic?Bucket=com.twilio.music.soft-rock&',
