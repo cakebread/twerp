@@ -106,7 +106,6 @@ class RestClient(object):
                 print notification.more_info
             print
 
-
     def sid_call(self, sid):
         """Print results for given SID"""
         try:
@@ -124,7 +123,6 @@ class RestClient(object):
         print 'status: %s' % call.status
         print 'direction: %s' % call.direction
         print
-
 
     def get_sms_sid(self, sid):
         """Print results for given SID"""
@@ -144,7 +142,6 @@ class RestClient(object):
         print 'body: %s' % sms.body
         print
 
-
     def hangup(self, sid):
         '''Hangup a call by SID'''
         try:
@@ -155,7 +152,6 @@ class RestClient(object):
             logger.error(e)
             return 1
 
-
     def call_url(self, sid, url):
         '''Call a URL/Twimlet'''
         try:
@@ -163,7 +159,6 @@ class RestClient(object):
         except TwilioRestException, e:
             logger.error(e)
             return 1
-
 
     def hangup_all_calls(self):
         '''Call a URL/Twimlet'''
@@ -181,7 +176,6 @@ class RestClient(object):
             print "Hung up QUEUED SID: %s  From:%s" % (c.sid, c.from_)
             c.hangup()
         print
-
 
     def list_calls(self):
         '''List calls IN_PROGRESS, RINGING, or QUEUED'''
@@ -203,9 +197,8 @@ class RestClient(object):
         for c in calls:
             print "Queued: %s" % c.sid
 
-
-    def call_numbers(self, recipients, verbose=False, callerid=CALLER_ID, url=None,
-            say=None):
+    def call_numbers(self, recipients, verbose=False, callerid=CALLER_ID,
+            url=None, say=None):
         """
         callerid: string
         recipients: list of strings representing each phone number
@@ -222,7 +215,8 @@ class RestClient(object):
         for phone in recipients:
             logger.info("Placing call to: %s" % phone)
             try:
-                call = self.client.calls.create(to=phone, from_=callerid, url=url)
+                call = self.client.calls.create(to=phone,
+                        from_=callerid, url=url)
             except ServerNotFoundError, e:
                 logger.error(e)
                 return None
@@ -235,7 +229,6 @@ class RestClient(object):
             logger.info("SID: %s" % call.sid)
         return call.sid
 
-
     def send_sms(self, recipients, message, verbose=False, callerid=CALLER_ID):
         """
         callerid: string
@@ -244,7 +237,8 @@ class RestClient(object):
 
         for phone in recipients:
             try:
-                message = self.client.sms.messages.create(to=phone, from_=callerid,
+                message = self.client.sms.messages.create(to=phone,
+                        from_=callerid,
                         body=message)
             except ServerNotFoundError, e:
                 logger.error(e)
@@ -257,7 +251,6 @@ class RestClient(object):
                 logger.info("SID: %s" % message.sid)
                 logger.info("From: %s" % message.from_)
 
-
     def list_numbers(self, verbose=False):
         """List all my Twilio numbers"""
         try:
@@ -267,15 +260,19 @@ class RestClient(object):
                     with indent(4, quote=colored.blue(' >')):
                         for id in NUMBER_IDS:
                             puts("%s: %s" % (colored.green(id),
-                                getattr(number, NUMBER_IDS[NUMBER_IDS.index(id)])))
+                                getattr(number,
+                                    NUMBER_IDS[NUMBER_IDS.index(id)])))
 
                 else:
                     pass
                     #puts("  - Voice URL %s" % getattr(number,
                     #   NUMBER_IDS[NUMBER_IDS.index('voice_url')]))
-                    #puts("  - SMS URL %s" % getattr(number, NUMBER_IDS[NUMBER_IDS.index('sms_url')]))
+                    #puts("  - SMS URL %s" %
+                    #getattr(number,
+                    #    NUMBER_IDS[NUMBER_IDS.index('sms_url')]))
                     #puts("%s: %s" % (colored.green(id),
-                    #    getattr(number, NUMBER_IDS[NUMBER_IDS.index('voice-url')])))
+                    #    getattr(number,
+                    #    NUMBER_IDS[NUMBER_IDS.index('voice-url')])))
 
         except ServerNotFoundError, e:
             logger.error(e)
