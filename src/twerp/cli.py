@@ -28,9 +28,8 @@ from configobj import ConfigObj
 from clint.textui import colored, puts, indent
 
 from twerp.__init__ import __version__ as VERSION
-from twerp.twiliolib import (send_sms, list_sms, get_sms_sid,
-        list_numbers, list_calls, call_numbers, call_url,
-        hangup_all_calls, sid_call, notifications, hangup)
+from twerp.twiliolib import RestClient
+
 
 
 #For tab-completion when in interactive mode
@@ -45,11 +44,12 @@ URLS = ['http://twimlets.com/holdmusic?Bucket=com.twilio.music.rock&',
 
 
 class Interactive(cmd.Cmd):
-    """Simple command processor example."""
-    def __init__(self, sid=None):
+    """Cmmand processor"""
+    def __init__(self, client, sid=None):
         cmd.Cmd.__init__(self)
         self.sid = sid
         self.logger = logging.getLogger("twerp")
+        self.client = client
 
     def emptyline(self):
         return
@@ -62,7 +62,7 @@ class Interactive(cmd.Cmd):
         intro = "Type 'help' for twerp commands"
         self.sid = sid
         if self.sid is not None:
-            self.prompt = "twerp (%s...%s) >> " % (self.sid[0:5], self.sid[-3:])
+            self.prompt = "twerp (%s) >> " % self.sid[0:7]
         else:
             self.prompt = "twerp (...) >> "
         try:
@@ -77,7 +77,7 @@ class Interactive(cmd.Cmd):
         if not sid:
             sid = self.sid
         if sid:
-            sid_call(sid)
+            self.client.sid_call(sid)
         else:
             self.logger.error("Need an SID")
 
@@ -85,7 +85,7 @@ class Interactive(cmd.Cmd):
         '''
         Hangs up call associated with current SID shown in prompt.
         '''
-        hangup(self.sid)
+        self.client.hangup(self.sid)
         self.prompt = "twerp (...) >> "
 
     def do_nuke(self, arg=None):
@@ -93,14 +93,14 @@ class Interactive(cmd.Cmd):
         Hangs up all voice calls in progress for the entire account
         CAUTION: Read the above carefully.
         '''
-        hangup_all_calls()
+        self.client.hangup_all_calls()
         self.prompt = "twerp (...) >> "
 
     def do_list(self, args=None):
         '''
         List all calls in progress for your account
         '''
-        list_calls()
+        self.client.list_calls()
 
     def do_sid(self, sid):
         '''
@@ -108,8 +108,7 @@ class Interactive(cmd.Cmd):
         '''
         if sid:
             self.sid = sid
-            self.prompt = colored.red("twerp (%s...%s) >> " \
-                    % (self.sid[0:5], self.sid[-3:]))
+            self.prompt = colored.red("twerp (%s...) >> " % self.sid[0:7])
         else:
             print >> sys.stderr, "You must specify the SID to use."
 
@@ -123,7 +122,7 @@ class Interactive(cmd.Cmd):
             text = quote_plus(number)
             url = '%s%s' % (url, number)
             print url
-            call = call_url(self.sid, url)
+            call = self.client.call_url(self.sid, url)
             #print >> sys.stderr, call.status
 
     def do_url(self, url):
@@ -132,7 +131,7 @@ class Interactive(cmd.Cmd):
         url http://twimlets.com/some.twml
         '''
         if url:
-            call = call_url(self.sid, url)
+            call = self.client.call_url(self.sid, url)
             #print >> sys.stderr, call.status
         else:
             print >> sys.stderr, "You need to specify a valid TWML URL e.g. "
@@ -163,6 +162,7 @@ class Twerp(object):
     def __init__(self):
         self.options = None
         self.logger = logging.getLogger("twerp")
+        self.client = RestClient()
 
     def set_log_level(self):
         """
@@ -189,7 +189,7 @@ class Twerp(object):
         self.logger = self.set_log_level()
 
         if self.options.numbers:
-            return list_numbers(self.options.verbose)
+            return self.client.list_numbers(self.options.verbose)
         elif self.options.dial:
             if not self.options.url and not self.options.say:
                 self.logger.error("You must specify a --url with TwiML")
@@ -197,26 +197,26 @@ class Twerp(object):
                 http://twimlets.com/message?Message%5B0%5D=Hello%20Tworld& """)
                 return 1
             numbers = self.options.dial.split(",")
-            sid = call_numbers(numbers, self.options.verbose,
+            sid = self.client.call_numbers(numbers, self.options.verbose,
                     self.options.callerid, self.options.url,
                     self.options.say)
             if self.options.interactive:
-                Interactive().cmdloop(sid)
+                Interactive(self.client).cmdloop(sid)
                 return
         elif self.options.listsms:
-            return list_sms()
+            return self.client.list_sms()
         elif self.options.twerp_version:
             return self.twerp_version()
         elif self.options.sid:
-            return get_sms_sid(self.options.sid)
+            return self.client.get_sms_sid(self.options.sid)
         elif self.options.sms_recipients:
             numbers = self.options.sms_recipients.split(",")
-            return send_sms(numbers, self.options.sms_message,
+            return self.client.send_sms(numbers, self.options.sms_message,
                     self.options.verbose)
         elif self.options.notifications:
-            return notifications(self.options.verbose)
+            return self.client.notifications(self.options.verbose)
         elif self.options.interactive:
-            Interactive().cmdloop('')
+            Interactive(self.client).cmdloop('')
             return
         else:
             opt_parser.print_help()
