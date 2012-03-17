@@ -35,7 +35,7 @@ if not os.path.exists(twerp_config):
 
     AUTH_TOKEN = lkasjdfkljsl
     ACCOUNT_SID = iowjroiwjeroij
-    CALLER_ID = +13235551212
+    CALLER_ID = +12135551212
     """
     sys.exit(1)
 config = ConfigObj(twerp_config)
@@ -64,7 +64,7 @@ NUMBER_IDS = ['account_sid', 'api_version', 'auth', 'base_uri', 'capabilities',
 class FakeCall(object):
     '''For making --pretend calls'''
     def __init__(self):
-        self.sid = "YOURSID"
+        self.sid = "PRETEND_SID_DOESNT_MATTER"
         self.status = "in progress(test)"
 
 
