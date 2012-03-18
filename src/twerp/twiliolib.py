@@ -1,8 +1,8 @@
 
 """
 
-mytwilio.py
-======
+twiliolib.py
+============
 
 Desc: Send and receive SMS or make calls via Twilio REST API
 
@@ -27,7 +27,7 @@ from twilio import TwilioRestException
 from twilio.rest.resources import Call
 from clint.textui import colored, puts, indent
 
-logger = logging.getLogger("twerp")
+
 twerp_config = os.path.join(os.path.expanduser("~"), '.twerprc')
 
 if not os.path.exists(twerp_config):
@@ -61,13 +61,6 @@ NUMBER_IDS = ['account_sid', 'api_version', 'auth', 'base_uri', 'capabilities',
             'voice_url']
 
 
-class FakeCall(object):
-    '''For making --pretend calls'''
-    def __init__(self):
-        self.sid = "PRETEND_SID_DOESNT_MATTER"
-        self.status = "in progress(test)"
-
-
 def trim(text_msg):
     '''Text messages have a finite length'''
     return text_msg[0:MAX_LENGTH]
@@ -77,8 +70,13 @@ class RestClient(object):
 
     '''Holds client for REST connection'''
 
-    def __init__(self):
+    def __init__(self, connect=True):
+        self.logger = logging.getLogger("twerp")
+        if connect:
+            self.connect()
 
+    def connect(self):
+        '''Make a REST client connection to twilio'''
         self.client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
 
     def notifications(self, verbose=False):
@@ -86,7 +84,7 @@ class RestClient(object):
         try:
             notes = self.client.notifications.list()
         except ServerNotFoundError, e:
-            logger.error(e)
+            self.logger.error(e)
             return 1
         except TwilioRestException, e:
             print e
@@ -111,7 +109,7 @@ class RestClient(object):
         try:
             call = self.client.calls.get(sid)
         except ServerNotFoundError, e:
-            logger.error(e)
+            self.logger.error(e)
             return 1
         except TwilioRestException, e:
             print e
@@ -129,7 +127,7 @@ class RestClient(object):
         try:
             sms = self.client.sms.messages.get(sid)
         except ServerNotFoundError, e:
-            logger.error(e)
+            self.logger.error(e)
             return 1
         except TwilioRestException, e:
             print e
@@ -149,7 +147,7 @@ class RestClient(object):
             print "Call hung up."
             print
         except TwilioRestException, e:
-            logger.error(e)
+            self.logger.error(e)
             return 1
 
     def call_url(self, sid, url):
@@ -157,11 +155,11 @@ class RestClient(object):
         try:
             return self.client.calls.route(sid, url, method="POST")
         except TwilioRestException, e:
-            logger.error(e)
+            self.logger.error(e)
             return 1
 
     def hangup_all_calls(self):
-        '''Call a URL/Twimlet'''
+        '''Hangup all calls in progress, ringing or queued'''
         calls = self.client.calls.list(status=Call.IN_PROGRESS)
         for c in calls:
             print "Hung up IN_PROGRESS SID: %s  From:%s" % (c.sid, c.from_)
@@ -213,20 +211,19 @@ class RestClient(object):
             text = quote_plus(say)
             url = '%s%s' % (url, text)
         for phone in recipients:
-            logger.info("Placing call to: %s" % phone)
+            self.logger.info("Placing call to: %s" % phone)
             try:
                 call = self.client.calls.create(to=phone,
                         from_=callerid, url=url)
             except ServerNotFoundError, e:
-                logger.error(e)
+                self.logger.error(e)
                 return None
             except TwilioRestException, e:
-                logger.error(e)
+                self.logger.error(e)
                 return None
 
-            #call = FakeCall()
-            logger.info("Status: %s" % call.status)
-            logger.info("SID: %s" % call.sid)
+            self.logger.info("Status: %s" % call.status)
+            self.logger.info("SID: %s" % call.sid)
         return call.sid
 
     def send_sms(self, recipients, message, verbose=False, callerid=CALLER_ID):
@@ -236,20 +233,21 @@ class RestClient(object):
         message: Text to send via SMS"""
 
         for phone in recipients:
+            print "PHONE", phone
             try:
                 message = self.client.sms.messages.create(to=phone,
                         from_=callerid,
                         body=message)
             except ServerNotFoundError, e:
-                logger.error(e)
+                print e
                 return 1
             except TwilioRestException, e:
-                logger.error(e)
+                print e
                 return 1
             if verbose:
-                logger.info("Status: %s" % message.status)
-                logger.info("SID: %s" % message.sid)
-                logger.info("From: %s" % message.from_)
+                print("Status: %s" % message.status)
+                print("SID: %s" % message.sid)
+                print("From: %s" % message.from_)
 
     def list_numbers(self, verbose=False):
         """List all my Twilio numbers"""
@@ -275,7 +273,7 @@ class RestClient(object):
                     #    NUMBER_IDS[NUMBER_IDS.index('voice-url')])))
 
         except ServerNotFoundError, e:
-            logger.error(e)
+            self.logger.error(e)
             return 1
 
     def list_sms(self):
@@ -289,7 +287,7 @@ class RestClient(object):
         try:
             messages = self.client.sms.messages.list()
         except ServerNotFoundError, e:
-            logger.error(e)
+            self.logger.error(e)
             return 1
         except TwilioRestException, e:
             print e
