@@ -17,15 +17,13 @@ License : BSD
 __docformat__ = 'restructuredtext'
 
 
-import os
 import cmd
 import sys
 import optparse
 import logging
 from urllib import quote_plus
 
-from configobj import ConfigObj
-from clint.textui import colored, puts, indent
+from clint.textui import colored
 
 from twerp.__init__ import __version__ as VERSION
 from twerp.twiliolib import RestClient
