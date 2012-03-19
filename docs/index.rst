@@ -21,11 +21,15 @@ Example Usage
 
          Send SMS message to +12135551212
 
-    $ twerp -d +12135551212 -u http://computer.net/TwiML
+    $ twerp -d +12135551212 -y "Hi, how are you? This is twerp. Good bye."
+
+         Call +12135551212 and have Stephen Hawkings say "Hi...", then hang up.
+
+    $ twerp -d +12135551212 -u http://computer.net/twiml.xml
 
          Call +12135551212 and execute the TWIML at given URL
 
-    $ twerp -i -d +12135551212 -u http://computer.net/TwiML
+    $ twerp -i -d +12135551212 -u http://computer.net/twiml.xml
 
          Call +12135551212 and execute the TWIML at given URL, then go interactive command-line mode.
          You can then modify the call live with different verbs such as 'url <URL' to re-route calls.
@@ -43,6 +47,13 @@ Example Usage
     $ twerp -S nnnnnnnnnnnn
 
          Show details of SMS message by SID
+
+    $ twerp -C
+         List all voice conferences in-progress.
+
+
+    $ twerp -P
+         List particpants in each voice conferences in-progress.
 
 
 Articles
