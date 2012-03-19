@@ -43,14 +43,9 @@ config = ConfigObj(twerp_config)
 AUTH_TOKEN = config['AUTH_TOKEN']
 ACCOUNT_SID = config['ACCOUNT_SID']
 CALLER_ID = config['CALLER_ID']
-MAX_LENGTH = 160
 
-'''
-These are for showing detailed info about your Twilio phone numbers. It uses
-TwilioRestClient.phone_numbers. There are some I didn't cover because they
-require making multiple API calls, I don't know what they do yet, or aren't
-applicable.
-'''
+
+#From TwilioRestClient.phone_numbers. 
 NUMBER_IDS = ['account_sid', 'api_version', 'auth', 'base_uri', 'capabilities',
             'date_created', 'date_updated', 'friendly_name', 'id_key',  'name',
             'phone_number', 'sid', 'sms_application_sid',
@@ -60,10 +55,6 @@ NUMBER_IDS = ['account_sid', 'api_version', 'auth', 'base_uri', 'capabilities',
             'voice_fallback_method', 'voice_fallback_url', 'voice_method',
             'voice_url']
 
-
-def trim(text_msg):
-    '''Text messages have a finite length'''
-    return text_msg[0:MAX_LENGTH]
 
 
 class RestClient(object):
