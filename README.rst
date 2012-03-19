@@ -1,6 +1,8 @@
 README
 ======
 
+twerp version 0.0.5
+
 .. contents::
 
 

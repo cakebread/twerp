@@ -104,6 +104,47 @@ class RestClient(object):
                 print notification.more_info
             print
 
+    def list_conference_participants(self):
+        """List all conferences"""
+        try:
+            conferences = self.client.conferences.list(status="in-progress")
+        except ServerNotFoundError, e:
+            self.logger.error(e)
+            return 1
+        except TwilioRestException, e:
+            print e
+            return 1
+        for conference in conferences:
+            print conference.status
+            print conference.date_created
+            print conference.date_updated
+            print conference.friendly_name
+            print '[' + conference.sid[0:7] + '...]'
+            print '=' * 79
+            print
+        
+    def list_conferences(self):
+        """List all conferences"""
+        try:
+            conferences = self.client.conferences.list(status="in-progress")
+        except ServerNotFoundError, e:
+            self.logger.error(e)
+            return 1
+        except TwilioRestException, e:
+            print e
+            return 1
+        for conference in conferences:
+            print conference.status
+            print conference.date_created
+            print conference.date_updated
+            print conference.friendly_name
+            print '[' + conference.sid[0:7] + '...]'
+            print '=' * 79
+            print
+            for participant in conference.participants.list():
+                print participant.sid
+        
+
     def sid_call(self, sid):
         """Print results for given SID"""
         try:
@@ -261,17 +302,6 @@ class RestClient(object):
                                 getattr(number,
                                     NUMBER_IDS[NUMBER_IDS.index(id)])))
 
-                else:
-                    pass
-                    #puts("  - Voice URL %s" % getattr(number,
-                    #   NUMBER_IDS[NUMBER_IDS.index('voice_url')]))
-                    #puts("  - SMS URL %s" %
-                    #getattr(number,
-                    #    NUMBER_IDS[NUMBER_IDS.index('sms_url')]))
-                    #puts("%s: %s" % (colored.green(id),
-                    #    getattr(number,
-                    #    NUMBER_IDS[NUMBER_IDS.index('voice-url')])))
-
         except ServerNotFoundError, e:
             self.logger.error(e)
             return 1
@@ -283,7 +313,6 @@ class RestClient(object):
         TODO: Add filtering for from, to and date
         """
 
-        #from_ = CALLER_ID
         try:
             messages = self.client.sms.messages.list()
         except ServerNotFoundError, e:

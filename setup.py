@@ -6,7 +6,7 @@ README = open(os.path.join(here, 'README.rst')).read()
 NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
 
-version = '0.0.4'
+version = '0.0.5'
 
 install_requires = ['twilio>=3.3.3', 'ConfigObj', 'clint']
 
@@ -26,7 +26,7 @@ setup(name='twerp',
     ],
     keywords='twilio sms telephony',
     author='Rob Cakebread',
-    author_email='cakebread gmail com',
+    author_email='cakebread@gmail.com',
     url='http://github.com/cakebread/twerp',
     license='BSD',
     packages=find_packages('src'),

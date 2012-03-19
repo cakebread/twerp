@@ -202,6 +202,10 @@ class Twerp(object):
             if self.options.interactive:
                 Interactive(self.client).cmdloop(sid)
                 return
+        elif self.options.participants:
+            return self.client.list_conference_participants()
+        elif self.options.conferences:
+            return self.client.list_conferences()
         elif self.options.listsms:
             return self.client.list_sms()
         elif self.options.twerp_version:
@@ -307,6 +311,14 @@ def setup_opt_parser():
     group_reports.add_option("-F", "--notifications", action='store_true',
             dest="notifications", default=False, help="Show notifications " +
             "from Twilio API (error messages and warnings).")
+
+    group_reports.add_option("-C", "--conferences", action='store_true',
+            dest="conferences", default=False,
+            help="Show conferences in-progress.")
+
+    group_reports.add_option("-P", "--conference-participants", action='store_true',
+            dest="participants", default=False,
+            help="Show participants for all conferences in-progress.")
 
     group_reports.add_option("-N", "--numbers", action='store_true',
             dest="numbers", default=False, help="Show all my Twilio phone " +
