@@ -70,6 +70,23 @@ class RestClient(object):
         '''Make a REST client connection to twilio'''
         self.client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
 
+    def list_applications(self, verbose=False):
+        '''Print error messages and warnings from Twilio'''
+        try:
+            apps = self.client.applications.list()
+        except ServerNotFoundError, e:
+            self.logger.error(e)
+            return 1
+        except TwilioRestException, e:
+            print e
+            return 1
+        for app in apps:
+            print app.friendly_name
+            print "\tSMS URL: %s" % app.sms_url
+            print "\tVoice URL: %s" % app.voice_url
+            print "=" * 79
+            print
+
     def notifications(self, verbose=False):
         '''Print error messages and warnings from Twilio'''
         try:

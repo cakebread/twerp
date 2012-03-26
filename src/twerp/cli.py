@@ -200,6 +200,8 @@ class Twerp(object):
             if self.options.interactive:
                 Interactive(self.client).cmdloop(sid)
                 return
+        elif self.options.applications:
+            return self.client.list_applications()
         elif self.options.participants:
             return self.client.list_conference_participants()
         elif self.options.conferences:
@@ -302,6 +304,14 @@ def setup_opt_parser():
             dest="url", default=False,
             help="URL of TWIML to pass call with --call")
 
+    group_call.add_option("-C", "--conferences", action='store_true',
+            dest="conferences", default=False,
+            help="Show conferences in-progress.")
+
+    group_call.add_option("-P", "--conference-participants", action='store_true',
+            dest="participants", default=False,
+            help="Show participants for all conferences in-progress.")
+
     group_reports = optparse.OptionGroup(opt_parser,
             "Reporting options",
             "List your Twilio phone numbers and information about each.")
@@ -310,14 +320,6 @@ def setup_opt_parser():
             dest="notifications", default=False, help="Show notifications " +
             "from Twilio API (error messages and warnings).")
 
-    group_reports.add_option("-C", "--conferences", action='store_true',
-            dest="conferences", default=False,
-            help="Show conferences in-progress.")
-
-    group_reports.add_option("-P", "--conference-participants", action='store_true',
-            dest="participants", default=False,
-            help="Show participants for all conferences in-progress.")
-
     group_reports.add_option("-N", "--numbers", action='store_true',
             dest="numbers", default=False, help="Show all my Twilio phone " +
             "numbers. Use -Nv for detailed info on each number.")
@@ -325,10 +327,18 @@ def setup_opt_parser():
     group_reports.add_option("-S", "--SID", action='store',
             dest="sid", default=False, help="Show log for given SID")
 
+    group_applications = optparse.OptionGroup(opt_parser,
+            "Applications",
+            "Twilio Application information.")
+
+    group_applications.add_option("-A", "--applications", action='store_true',
+            dest="applications", default=False, help="Show all my Twilio Applications.")
+
     opt_parser.add_option_group(group_common)
     opt_parser.add_option_group(group_sms)
     opt_parser.add_option_group(group_call)
     opt_parser.add_option_group(group_reports)
+    opt_parser.add_option_group(group_applications)
     return opt_parser
 
 
