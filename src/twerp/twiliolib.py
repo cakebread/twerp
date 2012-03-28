@@ -26,6 +26,8 @@ from twilio.rest import TwilioRestClient
 from twilio import TwilioRestException
 from twilio.rest.resources import Call
 from clint.textui import colored, puts, indent
+#import simplejson as json
+import json
 
 
 twerp_config = os.path.join(os.path.expanduser("~"), '.twerprc')
@@ -78,7 +80,8 @@ class RestClient(object):
             self.logger.error(e)
             return 1
         except TwilioRestException, e:
-            print e
+            msg = json.loads(e.msg)
+            print msg["message"]
             return 1
         for app in apps:
             print app.friendly_name
@@ -95,7 +98,8 @@ class RestClient(object):
             self.logger.error(e)
             return 1
         except TwilioRestException, e:
-            print e
+            msg = json.loads(e.msg)
+            print msg["message"]
             return 1
 
         notes.reverse()
@@ -120,7 +124,8 @@ class RestClient(object):
             self.logger.error(e)
             return 1
         except TwilioRestException, e:
-            print e
+            msg = json.loads(e.msg)
+            print msg["message"]
             return 1
         for conference in conferences:
             print conference.status
@@ -139,7 +144,8 @@ class RestClient(object):
             self.logger.error(e)
             return 1
         except TwilioRestException, e:
-            print e
+            msg = json.loads(e.msg)
+            print msg["message"]
             return 1
         for conference in conferences:
             print conference.status
@@ -161,7 +167,8 @@ class RestClient(object):
             self.logger.error(e)
             return 1
         except TwilioRestException, e:
-            print e
+            msg = json.loads(e.msg)
+            print msg["message"]
             return 1
 
         print 'date: %s' % call.date_created
@@ -171,6 +178,36 @@ class RestClient(object):
         print 'direction: %s' % call.direction
         print
 
+    def purchase_number(self, number):
+        """Purchase phone number"""
+        try:
+            number = self.client.phone_numbers.purchase(number)
+        except ServerNotFoundError, e:
+            self.logger.error(e)
+            return 1
+        except TwilioRestException, e:
+            msg = json.loads(e.msg)
+            print msg["message"]
+            return 1
+
+    def search_numbers(self, area_code):
+        """Print numbers available for purchase"""
+        try:
+            numbers = self.client.phone_numbers.search(area_code=area_code)
+        except ServerNotFoundError, e:
+            self.logger.error(e)
+            return 1
+        except TwilioRestException, e:
+            msg = json.loads(e.msg)
+            print msg["message"]
+            return 1
+        for number in numbers:
+            print number.phone_number
+            print "Zip code: %s" % number.postal_code
+            print "Region: %s" % number.region
+            print "=" * 15
+            print
+
     def get_sms_sid(self, sid):
         """Print results for given SID"""
         try:
@@ -179,7 +216,8 @@ class RestClient(object):
             self.logger.error(e)
             return 1
         except TwilioRestException, e:
-            print e
+            msg = json.loads(e.msg)
+            print msg["message"]
             return 1
 
         print('date: %s' % sms.date_sent)
@@ -196,7 +234,8 @@ class RestClient(object):
             print "Call hung up."
             print
         except TwilioRestException, e:
-            self.logger.error(e)
+            msg = json.loads(e.msg)
+            print msg["message"]
             return 1
 
     def call_url(self, sid, url):
@@ -204,11 +243,10 @@ class RestClient(object):
         try:
             return self.client.calls.route(sid, url, method="POST")
         except TwilioRestException, e:
-            self.logger.error(e)
+            msg = json.loads(e.msg)
+            #print msg["message"]
+            self.logger.error(msg)
             return 1
-
-    def hangup_all_calls(self):
-        '''Hangup all calls in progress, ringing or queued'''
         calls = self.client.calls.list(status=Call.IN_PROGRESS)
         for c in calls:
             print "Hung up IN_PROGRESS SID: %s  From:%s" % (c.sid, c.from_)
