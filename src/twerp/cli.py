@@ -312,7 +312,7 @@ def setup_opt_parser():
             dest="conferences", default=False,
             help="Show conferences in-progress.")
 
-    group_call.add_option("-B", "--buy", action='store',
+    group_call.add_option("-b", "--buy", action='store',
             dest="purchase", default=False,
             metavar="+12135551212",
             help="Buy a specific phone number listed with -x")
