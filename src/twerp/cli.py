@@ -202,8 +202,12 @@ class Twerp(object):
                 return
         elif self.options.purchase:
             return self.client.purchase_number(self.options.purchase)
-        elif self.options.search:
-            return self.client.search_numbers(self.options.search)
+        elif self.options.contains and self.options.areacode:
+            return self.client.numbers_contain_areacode(self.options.areacode, self.options.contains)
+        elif self.options.contains:
+            return self.client.numbers_contain(self.options.contains)
+        elif self.options.areacode:
+            return self.client.search_numbers(self.options.areacode)
         elif self.options.applications:
             return self.client.list_applications()
         elif self.options.participants:
@@ -317,10 +321,14 @@ def setup_opt_parser():
             metavar="+12135551212",
             help="Buy a specific phone number listed with -x")
 
-    group_call.add_option("-x", "--search", action='store',
-            dest="search", default=False,
+    group_call.add_option("-a", "--area-code", action='store',
+            dest="areacode", default=False,
             metavar="AREA CODE",
-            help="Search area code for phone number to buy.")
+            help="Search for phone number to purchase by area code. Use -b to purchase from these results.")
+
+    group_call.add_option("-x", "--contains", action='store',
+            dest="contains", default=False,
+            help="Search for phone number to purchase by numbers or letters it contains.")
 
     group_call.add_option("-P", "--conference-participants", action='store_true',
             dest="participants", default=False,

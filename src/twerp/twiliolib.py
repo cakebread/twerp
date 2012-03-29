@@ -190,6 +190,42 @@ class RestClient(object):
             print msg["message"]
             return 1
 
+    def numbers_contain_areacode(self, area_code, contains):
+        """Print numbers available for purchase"""
+        try:
+            numbers = self.client.phone_numbers.search(area_code=area_code, contains=contains)
+        except ServerNotFoundError, e:
+            self.logger.error(e)
+            return 1
+        except TwilioRestException, e:
+            msg = json.loads(e.msg)
+            print msg["message"]
+            return 1
+        for number in numbers:
+            print number.phone_number
+            print "Zip code: %s" % number.postal_code
+            print "Region: %s" % number.region
+            print "=" * 15
+            print
+
+    def numbers_contain(self, contains):
+        """Print numbers available for purchase"""
+        try:
+            numbers = self.client.phone_numbers.search(contains=contains)
+        except ServerNotFoundError, e:
+            self.logger.error(e)
+            return 1
+        except TwilioRestException, e:
+            msg = json.loads(e.msg)
+            print msg["message"]
+            return 1
+        for number in numbers:
+            print number.phone_number
+            print "Zip code: %s" % number.postal_code
+            print "Region: %s" % number.region
+            print "=" * 15
+            print
+
     def search_numbers(self, area_code):
         """Print numbers available for purchase"""
         try:
