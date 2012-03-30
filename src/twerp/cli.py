@@ -29,16 +29,6 @@ from twerp.__init__ import __version__ as VERSION
 from twerp.twiliolib import RestClient
 
 
-#For tab-completion when in interactive mode
-URLS = ['http://twimlets.com/holdmusic?Bucket=com.twilio.music.rock&',
-        'http://twimlets.com/holdmusic?Bucket=com.twilio.music.soft-rock&',
-        'http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient&',
-        'http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical&',
-        'http://twimlets.com/holdmusic?Bucket=com.twilio.music.electronica&',
-        'http://twimlets.com/holdmusic?Bucket=com.twilio.music.guitars&',
-        'http://twimlets.com/holdmusic?Bucket=com.twilio.music.newage&',
-        ]
-
 
 class Interactive(cmd.Cmd):
     """Cmmand processor"""
@@ -135,16 +125,6 @@ class Interactive(cmd.Cmd):
             print >> sys.stderr, \
                 "http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient"
 
-    def complete_url(self, text, line, begidx, endix):
-        if not text:
-            completions = URLS[:]
-        else:
-            completions = [f
-                            for f in URLS
-                            if f.startswith(text)
-                            ]
-        return completions
-
     def do_EOF(self, line):
         '''Exit twerp's interactive mode'''
         return True
@@ -158,7 +138,6 @@ class Twerp(object):
 
     def __init__(self):
         self.options = None
-        self.logger = logging.getLogger("twerp")
         self.client = RestClient()
 
     def set_log_level(self):
@@ -167,13 +146,21 @@ class Twerp(object):
 
         @returns: logger object
         """
+        LOG_FORMAT = '%(asctime)s %(levelname)-8s %(name)s %(message)s'
+
+        #LOG_FORMAT = '%(asctime)s %(name)s %(message)s'
+
+        #logging.basicConfig(level=logging.DEBUG, format=LOG_FORMAT)
+        logging.basicConfig(level=logging.ERROR)
+        logger = logging.getLogger("twerp")
+        #formatter = logging.Formatter(LOG_FORMAT)
+
 
         if self.options.debug:
-            self.logger.setLevel(logging.DEBUG)
+            logger.setLevel(logging.DEBUG)
         elif self.options.verbose:
-            self.logger.setLevel(logging.INFO)
-        self.logger.addHandler(logging.StreamHandler())
-        return self.logger
+            logger.setLevel(logging.INFO)
+        return logger
 
     def run(self):
         """
@@ -200,10 +187,23 @@ class Twerp(object):
             if self.options.interactive:
                 Interactive(self.client).cmdloop(sid)
                 return
+        elif self.options.conference:
+            if not self.options.room:
+                self.logger.error("You must specify a --room to join.")
+                return 1
+            numbers = self.options.conference.split(",")
+            sid = self.client.create_conference(numbers,
+                    self.options.room,
+                    self.options.verbose,
+                    self.options.callerid)
+            Interactive(self.client).cmdloop(sid)
+            return
         elif self.options.purchase:
             return self.client.purchase_number(self.options.purchase)
         elif self.options.contains and self.options.areacode:
-            return self.client.numbers_contain_areacode(self.options.areacode, self.options.contains)
+            return self.client.numbers_contain_areacode(
+                    self.options.areacode,
+                    self.options.contains)
         elif self.options.contains:
             return self.client.numbers_contain(self.options.contains)
         elif self.options.areacode:
@@ -255,9 +255,10 @@ def setup_opt_parser():
     usage = "usage: %prog [options]"
     opt_parser = optparse.OptionParser(usage=usage)
 
-    opt_parser.add_option("-V", "--version", action="store_true",
+    opt_parser.add_option("--version", action="store_true",
             dest="twerp_version", default=False,
             help="Show twerp version and exit.")
+
     opt_parser.add_option("-v", "--verbose", action='store_true',
             dest="verbose", default=False, help="Show more output stuff.")
 
@@ -275,9 +276,16 @@ def setup_opt_parser():
             dest="callerid", default=None,
             help="Phone number you are calling from or texting from.")
 
+    group_common.add_option("-i", "--interactive", action='store_true',
+            help="Go into interactive command-line mode after " +
+            "dialing (voice or conferences).",
+            dest="interactive", default=False)
+
+    #SMS
     group_sms = optparse.OptionGroup(opt_parser,
             "SMS options",
             "Send and reveive SMS text messages.")
+
     group_sms.add_option("-m", "--message", action='store',
             metavar="<TXT MSG>",
             dest="sms_message", default=False, help="Send SMS text message")
@@ -290,17 +298,15 @@ def setup_opt_parser():
     group_sms.add_option("-l", "--list-sms", action='store_true',
             dest="listsms", default=False, help="Show incoming SMS messages.")
 
+    #Calls (voice)
     group_call = optparse.OptionGroup(opt_parser,
             "Voice call options",
             "Place phone calls, execute TWIML.")
+
     group_call.add_option("-d", "--dial", action='store',
             metavar="+12135551212,+14155551212",
             help="List of numbers to dial, comma-separated.",
             dest="dial", default=False)
-
-    group_call.add_option("-i", "--interactive", action='store_true',
-            help="Go into interactive command-line mode after dialing.",
-            dest="interactive", default=False)
 
     group_call.add_option("-y", "--say", action='store',
             metavar="Say something.",
@@ -312,53 +318,76 @@ def setup_opt_parser():
             dest="url", default=False,
             help="URL of TWIML to pass call with --call")
 
-    group_call.add_option("-C", "--conferences", action='store_true',
-            dest="conferences", default=False,
-            help="Show conferences in-progress.")
-
     group_call.add_option("-b", "--buy", action='store',
             dest="purchase", default=False,
             metavar="+12135551212",
-            help="Buy a specific phone number listed with -x")
+            help="Buy a specific phone number listed with -x or -a")
 
     group_call.add_option("-a", "--area-code", action='store',
             dest="areacode", default=False,
             metavar="AREA CODE",
-            help="Search for phone number to purchase by area code. Use -b to purchase from these results.")
+            help="Search for phone number to purchase by area code. " +
+            "Use -b to purchase from these results.")
 
     group_call.add_option("-x", "--contains", action='store',
             dest="contains", default=False,
-            help="Search for phone number to purchase by numbers or letters it contains.")
+            help="Search for phone number to purchase by numbers " +
+            "or letters it contains.")
 
-    group_call.add_option("-P", "--conference-participants", action='store_true',
+    #Conferences
+    group_conferences = optparse.OptionGroup(opt_parser,
+            "Conference (voice) options",
+            "These options can be used for voice conference calls.")
+
+    group_conferences.add_option("-f", "--conference", action='store',
+            metavar="+12135551212,+14155551212",
+            help="Start conference with list of numbers to dial, " +
+            "comma-separated.",
+            dest="conference", default=False)
+
+    group_conferences.add_option("-o", "--room",
+            action='store',
+            dest="room", default=False,
+            help="Room to join for voice conference.")
+
+    group_conferences.add_option("-e", "--conferences", action='store_true',
+            dest="conferences", default=False,
+            help="Show conferences in-progress.")
+
+
+    group_conferences.add_option("-p", "--conference-participants",
+            action='store_true',
             dest="participants", default=False,
             help="Show participants for all conferences in-progress.")
 
+    #Reports
     group_reports = optparse.OptionGroup(opt_parser,
             "Reporting options",
             "List your Twilio phone numbers and information about each.")
 
-    group_reports.add_option("-F", "--notifications", action='store_true',
+    group_reports.add_option("-n", "--notifications", action='store_true',
             dest="notifications", default=False, help="Show notifications " +
             "from Twilio API (error messages and warnings).")
 
-    group_reports.add_option("-N", "--numbers", action='store_true',
+    group_reports.add_option("-r", "--numbers", action='store_true',
             dest="numbers", default=False, help="Show all my Twilio phone " +
             "numbers. Use -Nv for detailed info on each number.")
 
-    group_reports.add_option("-S", "--SID", action='store',
+    group_reports.add_option("--sid", action='store',
             dest="sid", default=False, help="Show log for given SID")
 
     group_applications = optparse.OptionGroup(opt_parser,
             "Applications",
             "Twilio Application information.")
 
-    group_applications.add_option("-A", "--applications", action='store_true',
-            dest="applications", default=False, help="Show all my Twilio Applications.")
+    group_applications.add_option("--applications", action='store_true',
+            dest="applications", default=False,
+            help="Show all my Twilio Applications.")
 
     opt_parser.add_option_group(group_common)
-    opt_parser.add_option_group(group_sms)
     opt_parser.add_option_group(group_call)
+    opt_parser.add_option_group(group_conferences)
+    opt_parser.add_option_group(group_sms)
     opt_parser.add_option_group(group_reports)
     opt_parser.add_option_group(group_applications)
     return opt_parser

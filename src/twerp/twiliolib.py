@@ -46,8 +46,10 @@ AUTH_TOKEN = config['AUTH_TOKEN']
 ACCOUNT_SID = config['ACCOUNT_SID']
 CALLER_ID = config['CALLER_ID']
 
+URL_CONFERENCE_TWIML = '''http://tinyurl.com/6vyxerr'''
 
-#From TwilioRestClient.phone_numbers. 
+
+#From TwilioRestClient.phone_numbers.
 NUMBER_IDS = ['account_sid', 'api_version', 'auth', 'base_uri', 'capabilities',
             'date_created', 'date_updated', 'friendly_name', 'id_key',  'name',
             'phone_number', 'sid', 'sms_application_sid',
@@ -56,7 +58,6 @@ NUMBER_IDS = ['account_sid', 'api_version', 'auth', 'base_uri', 'capabilities',
             'voice_application_sid', 'voice_caller_id_lookup',
             'voice_fallback_method', 'voice_fallback_url', 'voice_method',
             'voice_url']
-
 
 
 class RestClient(object):
@@ -135,7 +136,7 @@ class RestClient(object):
             print '[' + conference.sid[0:7] + '...]'
             print '=' * 79
             print
-        
+
     def list_conferences(self):
         """List all conferences"""
         try:
@@ -157,7 +158,6 @@ class RestClient(object):
             print
             for participant in conference.participants.list():
                 print participant.sid
-        
 
     def sid_call(self, sid):
         """Print results for given SID"""
@@ -193,7 +193,9 @@ class RestClient(object):
     def numbers_contain_areacode(self, area_code, contains):
         """Print numbers available for purchase"""
         try:
-            numbers = self.client.phone_numbers.search(area_code=area_code, contains=contains)
+            numbers = self.client.phone_numbers.search(
+                    area_code=area_code,
+                    contains=contains)
         except ServerNotFoundError, e:
             self.logger.error(e)
             return 1
@@ -274,25 +276,42 @@ class RestClient(object):
             print msg["message"]
             return 1
 
-    def call_url(self, sid, url):
+    def hangup_all_calls(self):
         '''Call a URL/Twimlet'''
         try:
-            return self.client.calls.route(sid, url, method="POST")
+            calls = self.client.calls.list(status=Call.IN_PROGRESS)
         except TwilioRestException, e:
             msg = json.loads(e.msg)
             #print msg["message"]
             self.logger.error(msg)
             return 1
-        calls = self.client.calls.list(status=Call.IN_PROGRESS)
+
+        self.logger.info("Checking for calls in progress...")
         for c in calls:
             print "Hung up IN_PROGRESS SID: %s  From:%s" % (c.sid, c.from_)
             c.hangup()
-        calls = self.client.calls.list(status=Call.RINGING)
+        try:
+            calls = self.client.calls.list(status=Call.RINGING)
+        except TwilioRestException, e:
+            msg = json.loads(e.msg)
+            #print msg["message"]
+            self.logger.error(msg)
+            return 1
+
+        self.logger.info("Checking for calls that are ringing...")
         for c in calls:
             print "Hung up RINGING SID: %s  From:%s" % (c.sid, c.from_)
             c.hangup()
 
-        calls = self.client.calls.list(status=Call.QUEUED)
+        self.logger.info("Checking for calls that are queued...")
+        try:
+            calls = self.client.calls.list(status=Call.QUEUED)
+        except TwilioRestException, e:
+            msg = json.loads(e.msg)
+            #print msg["message"]
+            self.logger.error(msg)
+            return 1
+
         for c in calls:
             print "Hung up QUEUED SID: %s  From:%s" % (c.sid, c.from_)
             c.hangup()
@@ -300,7 +319,14 @@ class RestClient(object):
 
     def list_calls(self):
         '''List calls IN_PROGRESS, RINGING, or QUEUED'''
-        calls = self.client.calls.list(status=Call.IN_PROGRESS)
+        try:
+            calls = self.client.calls.list(status=Call.IN_PROGRESS)
+        except TwilioRestException, e:
+            msg = json.loads(e.msg)
+            #print msg["message"]
+            self.logger.error(msg)
+            return 1
+
         for c in calls:
             print "SID: %s" % c.sid
             print "From: %s" % c.from_
@@ -310,13 +336,59 @@ class RestClient(object):
             print "Direction: %s" % c.direction
             print "Start: %s" % c.start_time
 
-        calls = self.client.calls.list(status=Call.RINGING)
+        try:
+            calls = self.client.calls.list(status=Call.RINGING)
+        except TwilioRestException, e:
+            msg = json.loads(e.msg)
+            #print msg["message"]
+            self.logger.error(msg)
+            return 1
+
         for c in calls:
             print "Ringing: %s" % c.sid
 
-        calls = self.client.calls.list(status=Call.QUEUED)
+        try:
+            calls = self.client.calls.list(status=Call.QUEUED)
+        except TwilioRestException, e:
+            msg = json.loads(e.msg)
+            #print msg["message"]
+            self.logger.error(msg)
+            return 1
+
         for c in calls:
             print "Queued: %s" % c.sid
+
+    def create_conference(self, recipients, room, verbose=False,
+            callerid=CALLER_ID):
+        """
+        callerid: string
+        recipients: list of strings representing each phone number
+        """
+
+        if callerid is None:
+            callerid = CALLER_ID
+
+        my_url = URL_CONFERENCE_TWIML.replace('ROOM_NAME', room)
+        self.logger.debug(my_url)
+        for phone in recipients:
+            self.logger.info("Placing call to: %s" % phone)
+            try:
+                call = self.client.calls.create(to=phone,
+                        from_=callerid, url=my_url)
+            except ServerNotFoundError, e:
+                self.logger.error(e)
+                return None
+            except TwilioRestException, e:
+                #print e
+                #msg = json.loads(e.msg)
+                #self.logger(msg["message"])
+                #self.logger.error(e)
+                print e
+                return None
+
+            self.logger.info("Status: %s" % call.status)
+            self.logger.info("SID: %s" % call.sid)
+        return call.sid
 
     def call_numbers(self, recipients, verbose=False, callerid=CALLER_ID,
             url=None, say=None):
@@ -342,7 +414,11 @@ class RestClient(object):
                 self.logger.error(e)
                 return None
             except TwilioRestException, e:
-                self.logger.error(e)
+                #print e
+                #msg = json.loads(e.msg)
+                #self.logger(msg["message"])
+                #self.logger.error(e)
+                print e
                 return None
 
             self.logger.info("Status: %s" % call.status)
