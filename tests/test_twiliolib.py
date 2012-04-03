@@ -2,7 +2,7 @@
 
 from httplib2 import ServerNotFoundError
 from mock import Mock, MagicMock, patch
-from twerp.twiliolib import RestClient
+from twerp.twilio_support import RestClient
 
 
 def test_send_sms():

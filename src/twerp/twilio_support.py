@@ -26,8 +26,10 @@ from twilio.rest import TwilioRestClient
 from twilio import TwilioRestException
 from twilio.rest.resources import Call
 from clint.textui import colored, puts, indent
-#import simplejson as json
-import json
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 
 twerp_config = os.path.join(os.path.expanduser("~"), '.twerprc')
@@ -377,17 +379,13 @@ class RestClient(object):
                         from_=callerid, url=my_url)
             except ServerNotFoundError, e:
                 self.logger.error(e)
-                return None
+                return
             except TwilioRestException, e:
-                #print e
-                #msg = json.loads(e.msg)
-                #self.logger(msg["message"])
-                #self.logger.error(e)
-                print e
-                return None
+                self.logger.error(e)
+                return
 
             self.logger.info("Status: %s" % call.status)
-            self.logger.info("SID: %s" % call.sid)
+            self.logger.debug("SID: %s" % call.sid)
         return call.sid
 
     def call_numbers(self, recipients, verbose=False, callerid=CALLER_ID,
@@ -401,7 +399,6 @@ class RestClient(object):
             callerid = CALLER_ID
 
         if say:
-            #Let's hope this URL never goes away.
             url = '''http://twimlets.com/message?Message%5B0%5D='''
             text = quote_plus(say)
             url = '%s%s' % (url, text)
@@ -414,11 +411,7 @@ class RestClient(object):
                 self.logger.error(e)
                 return None
             except TwilioRestException, e:
-                #print e
-                #msg = json.loads(e.msg)
-                #self.logger(msg["message"])
-                #self.logger.error(e)
-                print e
+                self.logger.error(e)
                 return None
 
             self.logger.info("Status: %s" % call.status)
@@ -432,7 +425,7 @@ class RestClient(object):
         message: Text to send via SMS"""
 
         for phone in recipients:
-            print "PHONE", phone
+            print("PHONE", phone)
             try:
                 message = self.client.sms.messages.create(to=phone,
                         from_=callerid,

@@ -26,8 +26,7 @@ from urllib import quote_plus
 from clint.textui import colored
 
 from twerp.__init__ import __version__ as VERSION
-from twerp.twiliolib import RestClient
-
+from twerp.twilio_support import RestClient
 
 
 class Interactive(cmd.Cmd):
@@ -146,15 +145,10 @@ class Twerp(object):
 
         @returns: logger object
         """
-        LOG_FORMAT = '%(asctime)s %(levelname)-8s %(name)s %(message)s'
+        log_format = '%(message)s'
 
-        #LOG_FORMAT = '%(asctime)s %(name)s %(message)s'
-
-        #logging.basicConfig(level=logging.DEBUG, format=LOG_FORMAT)
-        logging.basicConfig(level=logging.ERROR)
+        logging.basicConfig(level=logging.ERROR, format=log_format)
         logger = logging.getLogger("twerp")
-        #formatter = logging.Formatter(LOG_FORMAT)
-
 
         if self.options.debug:
             logger.setLevel(logging.DEBUG)
@@ -176,9 +170,8 @@ class Twerp(object):
             return self.client.list_numbers(self.options.verbose)
         elif self.options.dial:
             if not self.options.url and not self.options.say:
-                self.logger.error("You must specify a --url with TwiML")
-                self.logger.error("""e.g. This URL will say 'hello tworld'
-                http://twimlets.com/message?Message%5B0%5D=Hello%20Tworld& """)
+                self.logger.error("You must specify a --url with TwiML " +
+                    "or --say something")
                 return 1
             numbers = self.options.dial.split(",")
             sid = self.client.call_numbers(numbers, self.options.verbose,
@@ -196,7 +189,8 @@ class Twerp(object):
                     self.options.room,
                     self.options.verbose,
                     self.options.callerid)
-            Interactive(self.client).cmdloop(sid)
+            if self.options.interactive:
+                Interactive(self.client).cmdloop(sid)
             return
         elif self.options.purchase:
             return self.client.purchase_number(self.options.purchase)
@@ -231,7 +225,7 @@ class Twerp(object):
             return
         else:
             opt_parser.print_help()
-        return 2
+        return 1
 
     def twerp_version(self):
         """
@@ -249,8 +243,6 @@ def setup_opt_parser():
     @returns: opt_parser.OptionParser
 
     """
-    #pylint: disable-msg=C0301
-    #line too long
 
     usage = "usage: %prog [options]"
     opt_parser = optparse.OptionParser(usage=usage)
@@ -268,6 +260,7 @@ def setup_opt_parser():
     opt_parser.add_option("-q", "--quiet", action='store_true',
             dest="quiet", default=False, help="Show less output.")
 
+    #Common
     group_common = optparse.OptionGroup(opt_parser,
             "Common options",
             "These options can be used for both SMS and voice calls.")
@@ -354,7 +347,6 @@ def setup_opt_parser():
             dest="conferences", default=False,
             help="Show conferences in-progress.")
 
-
     group_conferences.add_option("-p", "--conference-participants",
             action='store_true',
             dest="participants", default=False,
@@ -371,7 +363,7 @@ def setup_opt_parser():
 
     group_reports.add_option("-r", "--numbers", action='store_true',
             dest="numbers", default=False, help="Show all my Twilio phone " +
-            "numbers. Use -Nv for detailed info on each number.")
+            "numbers. Use -rv for detailed info on each number.")
 
     group_reports.add_option("--sid", action='store',
             dest="sid", default=False, help="Show log for given SID")
