@@ -173,18 +173,19 @@ Interactive Mode Commands
  * sid <SID> - Change the current SID associated with interactive-mode
 
 
+Installation
+------------
+pip install twerp
+
+
 Development
 -----------
 
 We're on Freenode #twerp
 We're on Twitter @TwerpForTwilio
 We're on Github https://github.com/cakebread/twerp
+We're on continuous integration a la Jenkins http://cakebread.info:8080
 Fork it, phone it.
-
-pip install twerp
-
-TODO
-----
 
 See http://blog.cakebread.info/
 

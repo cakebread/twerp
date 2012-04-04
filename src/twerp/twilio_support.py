@@ -101,6 +101,7 @@ class RestClient(object):
         for account in accounts:
             print account.friendly_name
             print account.sid
+            print account.status
             print
         #print dir(account)
 
