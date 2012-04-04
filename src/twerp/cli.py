@@ -202,6 +202,12 @@ class Twerp(object):
             return self.client.numbers_contain(self.options.contains)
         elif self.options.areacode:
             return self.client.search_numbers(self.options.areacode)
+        elif self.options.rename_account:
+             self.client.rename_account(self.options.rename_account)
+        elif self.options.list_accounts:
+             self.client.list_accounts()
+        elif self.options.rename_account:
+             self.client.create_subaccount(self.options.create_subaccount)
         elif self.options.applications:
             return self.client.list_applications()
         elif self.options.participants:
@@ -368,6 +374,7 @@ def setup_opt_parser():
     group_reports.add_option("--sid", action='store',
             dest="sid", default=False, help="Show log for given SID")
 
+    #Applications
     group_applications = optparse.OptionGroup(opt_parser,
             "Applications",
             "Twilio Application information.")
@@ -376,12 +383,35 @@ def setup_opt_parser():
             dest="applications", default=False,
             help="Show all my Twilio Applications.")
 
+    #Accounts
+    group_accounts = optparse.OptionGroup(opt_parser,
+            "Accounts options",
+            "Twilio account and sub-account management")
+
+    group_accounts.add_option("--list-accounts", action='store_true',
+            dest="list_accounts",
+            default=False,
+            help="List all Twilio accounts and sub-accounts.")
+
+    group_accounts.add_option("--create-sub-account", action='store',
+            dest="create_subaccount",
+            metavar="NAME",
+            default=False,
+            help="Create sub-account named 'NAME'")
+
+    group_accounts.add_option("--rename-sub-account", action='store',
+            dest="rename_account",
+            metavar="NAME",
+            default=False,
+            help="Rename account or sub-account using 'NAME'")
+
     opt_parser.add_option_group(group_common)
     opt_parser.add_option_group(group_call)
     opt_parser.add_option_group(group_conferences)
     opt_parser.add_option_group(group_sms)
     opt_parser.add_option_group(group_reports)
     opt_parser.add_option_group(group_applications)
+    opt_parser.add_option_group(group_accounts)
     return opt_parser
 
 

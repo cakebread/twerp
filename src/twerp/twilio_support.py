@@ -75,6 +75,47 @@ class RestClient(object):
         '''Make a REST client connection to twilio'''
         self.client = TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
 
+    def rename_account(self, account_name, verbose=False):
+        '''Create Twilio sub-account'''
+        try:
+            account = self.client.accounts.get(ACCOUNT_SID)
+            account.update(friendly_name=account_name)
+        except ServerNotFoundError, e:
+            self.logger.error(e)
+            return 1
+        except TwilioRestException, e:
+            msg = json.loads(e.msg)
+            print msg["message"]
+            return 1
+
+    def list_accounts(self):
+        '''List Twilio account and sub-accounts'''
+        try:
+            accounts = self.client.accounts.list()
+        except ServerNotFoundError, e:
+            self.logger.error(e)
+            return 1
+        except TwilioRestException, e:
+            print e.msg
+            return 1
+        for account in accounts:
+            print account.friendly_name
+            print account.sid
+            print
+        #print dir(account)
+
+    def create_subaccount(self, account_name, verbose=False):
+        '''Create Twilio sub-account'''
+        try:
+            apps = self.client.accounts.create(account_name)
+        except ServerNotFoundError, e:
+            self.logger.error(e)
+            return 1
+        except TwilioRestException, e:
+            msg = json.loads(e.msg)
+            print msg["message"]
+            return 1
+
     def list_applications(self, verbose=False):
         '''Print error messages and warnings from Twilio'''
         try:
