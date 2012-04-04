@@ -1,7 +1,34 @@
 README
 ======
 
-twerp version 0.0.5
+**Twerp is the telephone hackers toolkit.**
+
+Twerp is also:
+
+ * A command-line interface for the Twilio API
+
+ * A tool that will revolutionize crank calling (only legal from California to the French parts of Canada. Note: IANALBISEEOC (I am not a lawyer but I've seen every episode of Cops).
+
+Features:
+
+ * Buy phone numbers fromt he command-line in the U.S., toll free and wherever Twilio sells them
+ * Manage Twilio accounts and sub-accounts: create new sub-accounts, list,
+   rename accouts
+ * Make phone calls from the command-line using stateless transactions 
+ * Command-line driven conference calls
+ * Modify the flow of calls or conferences in progress with a curses based
+   comand-line interface
+ * Send and receive SMS text messages
+ * Read your Twilio logs from the command-line
+ * Do lots of stuff without going to your dashboard on the twilio.com website
+
+
+TODO:
+
+ * Plugin system based on Python entry_points
+ * Plugin to launch Bottle web app and localtunnel.com it!
+ * Plugin for Phox Flask webapp
+
 
 .. contents::
 
