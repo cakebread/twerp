@@ -1,5 +1,17 @@
+
+Twerp is on #twerp via Freenode, IRC - come collaborate.
+
+
 Development setup
 =================
+
+I use 'gitflow' Git extensions to provide high-level repository operations for
+Vincent Driessen's branching model.
+
+https://github.com/nvie/gitflow
+
+Don't care about that? Then, basically, watch the 'develop' branch on github. The 'master' branch only
+contains stable tagged versions.
 
 
 Release HOWTO
@@ -7,9 +19,15 @@ Release HOWTO
 
 To make a release, 
 
-  1) Update release date/version in NEWS.txt and setup.py
-  2) Run 'python setup.py sdist'
-  3) Test the generated source distribution in dist/
+  1) Update release date/version in NEWS.txt, setup.py and src/twerp/__init__.py
+  
+  2) Configure tox.ini to use multiple python versions. The one in git is for
+  the Jenkins continuous integration running at http://cakebread.info/jenkins.
+  Only modify that in git if you're working on Jenkins.
+
+  3) Run 'tox' to build and test using multiple Python versions
+
   4) Upload to PyPI: 'python setup.py sdist register upload'
-  5) Increase version in setup.py (for next release)
+
+  5) Increase version in setup.py and src/twerp/__init__.py (for next release)
 

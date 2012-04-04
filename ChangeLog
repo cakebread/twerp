@@ -1,0 +1,150 @@
+2012-04-04  Rob Cakebread <cakebread@gmail.com>
+
+  * README.rst: Start of new README format
+
+  * src/twerp/cli.py, src/twerp/twilio_support.py: Add and list subaccount func
+
+2012-04-03  Rob Cakebread <cakebread@gmail.com>
+
+  * src/twerp/__init__.py, src/twerp/cli.py, src/twerp/twilio_support.py,
+  src/twerp/twiliolib.py, tests/test_twiliolib.py: Renamed twilio_support
+
+2012-03-29  Rob Cakebread <cakebread@gmail.com>
+
+  * README.rst, src/twerp/cli.py, src/twerp/twiliolib.py: Added conference
+  capability
+
+  * src/twerp/cli.py, src/twerp/twiliolib.py: Search by area code and contains
+
+2012-03-28  Rob Cakebread <cakebread@gmail.com>
+
+  * src/twerp/cli.py: Change buy commandline option
+
+  * src/twerp/cli.py, src/twerp/twiliolib.py: Added purchase number
+
+2012-03-26  Rob Cakebread <cakebread@gmail.com>
+
+  * src/twerp/cli.py, src/twerp/twiliolib.py: Add list_applications
+
+2012-03-18  Rob Cakebread <cakebread@gmail.com>
+
+  * .gitignore, docs/conf.py, docs/index.rst: Updated sphinx conf
+
+  * src/twerp/cli.py: pyflakes cleanup
+
+  * src/twerp/twiliolib.py: Removed unused func trim
+
+  * HACKING.txt, README.rst, setup.py, src/twerp/__init__.py, src/twerp/cli.py,
+  src/twerp/twiliolib.py: Added conference features
+
+  * tests/test_twiliolib.py: Fixed mock testing.
+
+  * README.rst: Fixed typo
+
+  * src/twerp/twiliolib.py: Refactor logging
+
+2012-03-16  Rob Cakebread <cakebread@gmail.com>
+
+  * HACKING.txt, src/twerp/twiliolib.py: Updated with Tox usage
+
+  * src/twerp/twiliolib.py: PEP8
+
+  * docs/_build/html/.buildinfo, docs/_build/html/_sources/index.txt,
+  docs/_build/html/_static/ajax-loader.gif, docs/_build/html/_static/basic.css,
+  docs/_build/html/_static/comment-bright.png,
+  docs/_build/html/_static/comment-close.png,
+  docs/_build/html/_static/comment.png, docs/_build/html/_static/default.css,
+  docs/_build/html/_static/doctools.js,
+  docs/_build/html/_static/down-pressed.png, docs/_build/html/_static/down.png,
+  docs/_build/html/_static/file.png, docs/_build/html/_static/jquery.js,
+  docs/_build/html/_static/minus.png, docs/_build/html/_static/plus.png,
+  docs/_build/html/_static/pygments.css,
+  docs/_build/html/_static/searchtools.js, docs/_build/html/_static/sidebar.js,
+  docs/_build/html/_static/underscore.js,
+  docs/_build/html/_static/up-pressed.png, docs/_build/html/_static/up.png,
+  docs/_build/html/_static/websupport.js, docs/_build/html/genindex.html,
+  docs/_build/html/index.html, docs/_build/html/objects.inv,
+  docs/_build/html/search.html, docs/_build/html/searchindex.js,
+  src/twerp/cli.py: Removed static docs
+
+  * src/twerp/cli.py, src/twerp/twiliolib.py, tests/test_twiliolib.py:
+  Refactored twiliolib into class
+
+  * tox.ini: Added 2.7.2 support
+
+  * .gitignore: Added .gitignore
+
+2012-03-12  Rob Cakebread <cakebread@gmail.com>
+
+  * src/twerp/__init__.py: Updated modules
+
+  * requires.txt: Updated with httplib2
+
+  * tests/test_twiliolib.py: Fix tests fox tox
+
+  * tox.ini: Fixed deps for tox
+
+2012-02-07  Rob Cakebread <cakebread@gmail.com>
+
+  * src/twerp/twiliolib.py, tests/test_twiliolib.py, tox.ini: Adding Jenkins
+  Tox pytest support
+
+  * tox.ini: Jenkins CI
+
+2012-01-31  Rob Cakebread <cakebread@gmail.com>
+
+  * tests/test_mytwilio.pyc: Remove pyc
+
+  * setup.py, src/twerp/cli.py, src/twerp/mytwilio.py, src/twerp/twiliolib.py:
+  Renamed twiliolib
+
+  * src/twerp/cli.py: Change prompt when SID changes
+
+2012-01-17  Rob Cakebread <cakebread@gmail.com>
+
+  * src/twerp/cli.py, src/twerp/mytwilio.py: Ensure exit codes are 0,1 or 2
+
+  * setup.py, src/twerp/__init__.py, src/twerp/cli.py: Updated release info
+
+  * README.rst: Updated for release 0.3
+
+  * README.rst: Updated for release 0.3
+
+  * setup.py, src/twerp/__init__.py: Updated for release 0.3
+
+  * NEWS.txt, README.rst: Updated for release 0.3
+
+  * NEWS.txt, src/twerp/cli.py, src/twerp/mytwilio.py: Better exception
+  handling
+
+2012-01-10  Rob Cakebread <cakebread@gmail.com>
+
+  * docs/index.rst: Added --interactive option
+
+  * src/twerp/cli.py, src/twerp/mytwilio.py: Added --interactive option
+
+2012-01-09  Rob Cakebread <cakebread@gmail.com>
+
+  * src/twerp/cli.py: Fix text formatting
+
+2012-01-06  Rob Cakebread <cakebread@gmail.com>
+
+  * README.rst: Update README
+
+  * NEWS.txt, README.rst: Updated README
+
+  * setup.py, src/twerp/__init__.py, src/twerp/cli.py: Version bump
+
+2012-01-05  Rob Cakebread <cakebread@gmail.com>
+
+  * src/twerp/cli.py, src/twerp/mytwilio.py: Added dialing
+
+  * README.rst: Updated docs
+
+  * README.rst: Updated install docs
+
+  * README.rst: Updated install docs
+
+  * README.rst: Updated install docs
+
+  * README.rst: Added install docs
