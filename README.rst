@@ -11,7 +11,7 @@ Twerp is also:
 
 Features:
 
- * Buy phone numbers fromt he command-line in the U.S., toll free and wherever Twilio sells them
+ * Buy phone numbers from the command-line in the U.S., toll free and wherever Twilio sells them
  * Manage Twilio accounts: create new sub-accounts, list, rename accouts
  * Make phone calls from the command-line 
  * Conrtol call flow from the command-line using stateless TwiML transactions (no web app necessary)
