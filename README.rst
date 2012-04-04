@@ -12,14 +12,13 @@ Twerp is also:
 Features:
 
  * Buy phone numbers fromt he command-line in the U.S., toll free and wherever Twilio sells them
- * Manage Twilio accounts and sub-accounts: create new sub-accounts, list,
-   rename accouts
- * Make phone calls from the command-line using stateless transactions 
+ * Manage Twilio accounts: create new sub-accounts, list, rename accouts
+ * Make phone calls from the command-line 
+ * Conrtol call flow from the command-line using stateless TwiML transactions (no web app necessary)
  * Command-line driven conference calls
- * Modify the flow of calls or conferences in progress with a curses based
-   comand-line interface
  * Send and receive SMS text messages
  * Read your Twilio logs from the command-line
+ * Modify the flow of calls or conferences in progress with a curses based comand-line interface
  * Do lots of stuff without going to your dashboard on the twilio.com website
 
 
@@ -131,6 +130,19 @@ Usage::
         Twilio Application information.
 
         --applications      Show all my Twilio Applications.
+
+
+      Accounts:
+        Twilio account and sub-account management
+
+        --list-accounts
+            List all Twilio accounts and sub-accounts.
+
+        --create-sub-account=NAME
+            Create sub-account named 'NAME'
+
+        --rename-sub-account=NAME
+            Rename account or sub-account using 'NAME'
 
 Interactive Mode
 ================
