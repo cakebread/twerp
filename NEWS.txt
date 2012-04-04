@@ -3,6 +3,19 @@
 News
 ====
 
+0.0.5
+-----
+
+*Release date: 4/4/2012
+
+* Added conference cabability
+* Added account management, list, rename and create new Twilio sub-accounts
+* Added application management: list all Twilio apps
+* Added feature to buy new phone numbers, basic searching by area code or phrase
+* Renamed a lot of command-line options
+* More unit tests
+
+
 0.0.3
 -----
 

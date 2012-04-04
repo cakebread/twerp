@@ -1,3 +1,7 @@
+
+Twerp is on #twerp via Freenode, IRC - come collaborate.
+
+
 Development setup
 =================
 
