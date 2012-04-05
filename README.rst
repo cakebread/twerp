@@ -7,6 +7,8 @@ Twerp is also:
 
  * A command-line interface for the Twilio API
 
+ * Your own Phone Company. From the command-line!
+
  * A tool that will revolutionize crank calling (only legal from California to the French parts of Canada. Note: IANALBISEEOC (I am not a lawyer but I've seen every episode of Cops).
 
 Features:
