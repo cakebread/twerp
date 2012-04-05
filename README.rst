@@ -29,6 +29,7 @@ TODO:
  * Plugin system based on Python entry_points
  * Plugin to launch Bottle web app and localtunnel.com it!
  * Plugin for Phox Flask webapp
+ * Create API for using alternate interfaces such as urwid to make complete SMS or phone app GUIs.
  * Make an entire website about what I could do with Twilio+Twerp.
 
 
