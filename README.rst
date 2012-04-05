@@ -181,11 +181,11 @@ pip install twerp
 Development
 -----------
 
-We're on Freenode #twerp
-We're on Twitter @TwerpForTwilio
-We're on Github https://github.com/cakebread/twerp
-We're on continuous integration a la Jenkins http://cakebread.info:8080
-Fork it, phone it.
+ * We're on Freenode #twerp
+ * We're on Twitter @TwerpForTwilio
+ * We're on Github https://github.com/cakebread/twerp
+ * We're on continuous integration a la Jenkins http://cakebread.info:8080
+ * Fork it, phone it.
 
 See http://blog.cakebread.info/
 

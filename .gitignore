@@ -8,3 +8,5 @@ tests/__pycache__/
 tests/*.xml
 upload_docs.sh
 docs/_build/
+docs/_build/doctrees/environment.pickle
+docs/_build/doctrees/index.doctree
