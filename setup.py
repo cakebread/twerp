@@ -6,9 +6,9 @@ README = open(os.path.join(here, 'README.rst')).read()
 NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
 
-version = '0.0.6'
+version = '0.0.7'
 
-install_requires = ['twilio>=3.3.3', 'ConfigObj', 'clint']
+install_requires = ['cliff', 'twilio>=3.3.3', 'ConfigObj', 'clint']
 
 
 setup(name='twerp',
