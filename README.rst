@@ -3,13 +3,16 @@ README
 
 **Twerp is the telephone hackers toolkit.**
 
+Legal Notice: Crank calls are only legal if they are funny in some states. 
+
 Twerp is also:
 
- * A command-line interface for the Twilio API
+ * A tool that will revolutionize crank calling (only legal from California to the French parts of Canada. Note: IANALBISEEOC (I am not a lawyer but I've seen every episode of Cops).
 
  * Your own Phone Company. From the command-line!
 
- * A tool that will revolutionize crank calling (only legal from California to the French parts of Canada. Note: IANALBISEEOC (I am not a lawyer but I've seen every episode of Cops).
+ * A command-line interface for the Twilio API
+
 
 Features:
 
